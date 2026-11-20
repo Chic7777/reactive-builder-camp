@@ -8,6 +8,13 @@ import { D5CronCallback } from "../src/d5/D5CronCallback.sol";
 
 /// @notice 在 Sepolia 公开状态的分叉上，走真实 Callback Proxy，而不是本地 Mock。
 ///         分叉块 12175552 是失败回调 0x5b94fa24 的前一块。
+///         生产编译保持 cancun。这个文件要在 Amsterdam 执行环境下跑：
+///         forge test --evm-version amsterdam --match-path test/D5CallbackGas.t.sol
+contract SstorePriceProbe {
+    uint256 internal slot;
+    function store() external { slot = 1; }
+}
+
 contract D5CallbackGasForkTest is Test {
     address payable constant PROXY = payable(0xAa14d9Cd0f788Ca23d11805986C1d8bd035D23b4);
     address constant OPERATOR = 0xF7E866D726658F6C3F14B8EE537fe268a4D91DDb;
@@ -17,7 +24,18 @@ contract D5CallbackGasForkTest is Test {
     uint256 constant PROXY_FRAME_GAS = 382552;
 
     function setUp() public {
-        vm.createSelectFork("https://ethereum-sepolia-rpc.publicnode.com", 12_175_552);
+        vm.createSelectFork(
+            vm.envOr("D5_SEPOLIA_FORK_URL", string("https://ethereum-sepolia-rpc.publicnode.com")),
+            12_175_552
+        );
+        SstorePriceProbe probe = new SstorePriceProbe();
+        uint256 before = gasleft();
+        probe.store();
+        // Cancun 的冷 SSTORE 大约 2 万 gas。Amsterdam 大约 10 万。
+        // 默认 cancun 套件不能复现这次 out of gas，所以跳过，而不是当成通过。
+        if (before - gasleft() < 50_000) {
+            vm.skip(true, "forge test --evm-version amsterdam --match-path test/D5CallbackGas.t.sol");
+        }
     }
 
     function test_fork_oldCallback_outOfGasThroughRealProxy() public {

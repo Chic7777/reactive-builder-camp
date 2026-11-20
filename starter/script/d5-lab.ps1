@@ -291,17 +291,22 @@ function Get-LiveNeed {
     $callbackFund = [decimal]$env:D5_CALLBACK_FUND
     $reactiveFund = [decimal]$env:D5_REACTIVE_FUND
     $sepoliaPrice = $sepoliaBase * 2
+    # forge prints "Estimated amount required" for gas only. The value sent into the
+    # contract is extra. Deploy sim gas is 852894 * 130 / 100 = 1108762. Max fee is
+    # 2 * baseFee + 1 wei, which is forge's own estimate. Do not use a lower multiplier.
     $oneGwei = [decimal]'1000000000'
     if ($sepoliaPrice -lt $oneGwei) { $sepoliaPrice = $oneGwei }
-    # First real callback deploy used 2431043 gas. Lasna deploy used 852894 and bind used 80468.
-    $sepoliaNeed = $callbackFund + (2500000 * $sepoliaPrice)
-    $lasnaPrice = $lasnaBase * 2
-    $lasnaNeed = $reactiveFund + (1000000 * $lasnaPrice)
+    $sepoliaGasCap = [decimal]3160356 * $sepoliaPrice
+    $sepoliaNeed = $callbackFund + $sepoliaGasCap
+    $lasnaMaxFee = ($lasnaBase * 2) + 1
+    $lasnaGasCap = [decimal]1108762 * $lasnaMaxFee
+    $lasnaNeed = $reactiveFund + $lasnaGasCap
     Write-Host "Wallet $Wallet"
     Write-Host "D5_CALLBACK_FUND wei=$callbackFund"
     Write-Host "D5_REACTIVE_FUND wei=$reactiveFund"
-    Write-Host "Sepolia balance wei=$sepoliaBal baseFee wei=$sepoliaBase need wei=$sepoliaNeed"
-    Write-Host "Lasna balance wei=$lasnaBal baseFee wei=$lasnaBase need wei=$lasnaNeed"
+    Write-Host "Sepolia balance wei=$sepoliaBal baseFee wei=$sepoliaBase gasCap wei=$sepoliaGasCap need wei=$sepoliaNeed"
+    Write-Host "Lasna balance wei=$lasnaBal baseFee wei=$lasnaBase gasCap wei=$lasnaGasCap need wei=$lasnaNeed"
+    Write-Host "Lasna gas cap does not include the lREACT stored in the new contract."
     return @{
         SepoliaBalance = $sepoliaBal
         LasnaBalance   = $lasnaBal
@@ -343,10 +348,12 @@ function Invoke-Preflight {
         Fail 'Sepolia balance is below the callback fund plus deploy headroom. No transaction was sent.'
     }
     if ($live.LasnaBalance -lt $live.LasnaNeed) {
-        Fail 'Lasna balance is below D5_REACTIVE_FUND plus a 2x base-fee cap (900000 deploy gas + 100000 bind gas). No transaction was sent. The first pair of reacts spent about 0.034 lREACT. D5_REACTIVE_FUND=60000000000000000 (0.06 ether in wei) is the amount that fits this wallet at a 2x cap. Sending 0.01 ETH to the Sepolia faucet 0x9b9BB25f1A81078C544C829c5EB7822d747Cf434 buys 1 lREACT if you want to keep 0.10. Do not set a fee cap below 2x the current base fee.'
+        Fail 'Lasna balance is below D5_REACTIVE_FUND plus forge gas cap (1108762 gas at 2x base fee). That cap does not include the value stored in the contract. No transaction was sent. Two reacts cost about 0.034 lREACT, so 50000000000000000 wei (0.05 ether) still leaves about 0.016 lREACT in the contract. 60000000000000000 wei plus the gas cap is above the current wallet. Do not lower the fee cap below 2x base fee.'
     }
     Write-Host 'Balance check passed. Compiling and testing. This does not broadcast.'
-    Invoke-Tool 'forge' @('test', '--match-path', 'test/D5Cron.t.sol', '-vv') | Out-Null
+    Invoke-Tool 'forge' @('test', '--match-path', 'test/D5Cron.t.sol', '--evm-version', 'cancun', '-vv') | Out-Null
+    Write-Host 'Running the Sepolia proxy gas test under Amsterdam. This does not broadcast.'
+    Invoke-Tool 'forge' @('test', '--match-path', 'test/D5CallbackGas.t.sol', '--evm-version', 'amsterdam', '-vv') | Out-Null
     Write-Host 'preflight finished. No transaction was sent.'
 }
 
@@ -357,7 +364,7 @@ function Invoke-DeployReactive {
     if ($live.LasnaBalance -lt $live.LasnaNeed) { Fail 'Lasna balance check failed. No transaction was sent.' }
     Invoke-Tool 'forge' @(
         'script', 'script/DeployD5Cron.s.sol:DeployD5Reactive',
-        '--rpc-url', $env:LASNA_RPC_URL, '--broadcast', '--chain', '5318007'
+        '--rpc-url', $env:LASNA_RPC_URL, '--broadcast', '--chain', '5318007', '--evm-version', 'cancun'
     ) | Out-Null
     Save-CreateFromBroadcast -ChainId '5318007' -ContractName 'D5CronReactive' -EnvName 'D5_REACTIVE_ADDR'
 }
@@ -370,7 +377,7 @@ function Invoke-DeployCallback {
     if ($live.SepoliaBalance -lt $live.SepoliaNeed) { Fail 'Sepolia balance check failed. No transaction was sent.' }
     Invoke-Tool 'forge' @(
         'script', 'script/DeployD5Cron.s.sol:DeployD5Callback',
-        '--rpc-url', $env:SEPOLIA_RPC_URL, '--broadcast', '--chain', '11155111'
+        '--rpc-url', $env:SEPOLIA_RPC_URL, '--broadcast', '--chain', '11155111', '--evm-version', 'cancun'
     ) | Out-Null
     Save-CreateFromBroadcast -ChainId '11155111' -ContractName 'D5CronCallback' -EnvName 'D5_CALLBACK_ADDR'
 }
@@ -385,7 +392,7 @@ function Invoke-Bind {
     }
     Invoke-Tool 'forge' @(
         'script', 'script/DeployD5Cron.s.sol:SetD5Recipient',
-        '--rpc-url', $env:LASNA_RPC_URL, '--broadcast', '--chain', '5318007'
+        '--rpc-url', $env:LASNA_RPC_URL, '--broadcast', '--chain', '5318007', '--evm-version', 'cancun'
     ) | Out-Null
     $found = Read-Broadcast '5318007'
     if ($null -eq $found) { Fail 'bind broadcast receipt was not found.' }
