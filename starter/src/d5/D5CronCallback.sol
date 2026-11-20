@@ -12,13 +12,20 @@ import { AbstractCallback } from "@reactive/src/base/AbstractCallback.sol";
 contract D5CronCallback is AbstractCallback {
     event Ticked(address indexed reactive, uint256 indexed tickIndex, uint256 cronNumber, uint256 count);
 
-    uint256 public count;
-    uint256 public lastCronNumber;
-    uint256 public lastTickIndex;
+    /// @dev 2026-11-20 Sepolia 上，一个从 0 写成非 0 的 SSTORE 大约 108000 gas，不是旧的 20000。
+    ///      三个独立槽大约 326000 gas。Proxy 从 gasLimit=400000 的交易里只转给 onTick 约 155800，
+    ///      所以三次写入会 out of gas。这三个数打包进同一个槽，只付一次 SSTORE。
+    uint64 private _count;
+    uint64 private _lastTickIndex;
+    uint128 private _lastCronNumber;
 
     /// @param proxy_    Ethereum Sepolia Callback Proxy：0xAa14d9Cd0f788Ca23d11805986C1d8bd035D23b4
     /// @param reactive_ Lasna 上的 D5CronReactive 地址
     constructor(IPayable proxy_, address reactive_) payable AbstractCallback(proxy_, reactive_) {}
+
+    function count() external view returns (uint256) { return _count; }
+    function lastCronNumber() external view returns (uint256) { return _lastCronNumber; }
+    function lastTickIndex() external view returns (uint256) { return _lastTickIndex; }
 
     /// @notice Proxy 调用的入口。第一个 address 由网络注入，不是 payload 里那个 address(0)。
     /// @param reactive_   注入后的 Lasna 合约地址，交给 onlyCallbackSender 核对
@@ -29,10 +36,10 @@ contract D5CronCallback is AbstractCallback {
         onlyServiceProvider
         onlyCallbackSender(reactive_)
     {
-        count += 1;
-        lastCronNumber = cronNumber_;
-        lastTickIndex = tickIndex_;
-        emit Ticked(reactive_, tickIndex_, cronNumber_, count);
+        _count += 1;
+        _lastCronNumber = uint128(cronNumber_);
+        _lastTickIndex = uint64(tickIndex_);
+        emit Ticked(reactive_, tickIndex_, cronNumber_, _count);
     }
 
     /// @notice 用本合约的 ETH 补上 Callback Proxy 记录的欠款。

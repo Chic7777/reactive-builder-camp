@@ -34,8 +34,8 @@ contract D5CronReactive is AbstractReactive {
     address public constant LEGACY_CRON = 0x0000000000000000000000000000000000fffFfF;
     /// @notice keccak256("Cron100(uint256)")。2026-11-20 用 cast keccak 对过。
     uint256 public constant CRON100_TOPIC0 = 0xb49937fb8970e19fd46d48f7e3fb00d659deac0347f79cd7cb542f0fc1503c70;
-    /// @notice 2026-11-20 Sepolia Proxy：_extraGas=150000，_maxChargeGas=50000，这两笔不转给 onTick。
-    ///         400000 扣掉之后大约还剩 200000，够三次存储写入。低于 100000 的请求会被网络丢掉。
+    /// @notice 中继把交易 gas 设成这个数。Proxy 还要留下 _extraGas 150000 和 _maxChargeGas 50000，
+    ///         实际转给 onTick 的大约是 156000。三次冷 SSTORE 不够，一次打包写入够。不要再往上加。
     uint64 public constant CALLBACK_GAS_LIMIT = 400_000;
 
     /// @notice Sepolia 上的 D5CronCallback。setRecipient 之前是 0，这段时间不订阅。

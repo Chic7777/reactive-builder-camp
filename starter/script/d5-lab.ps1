@@ -9,7 +9,7 @@
 #   powershell -ExecutionPolicy Bypass -File .\script\d5-lab.ps1 -Stage verify
 param(
     [Parameter(Mandatory = $true)]
-    [ValidateSet('preflight', 'deployReactive', 'deployCallback', 'bind', 'verify')]
+    [ValidateSet('preflight', 'prepareRerun', 'deployReactive', 'deployCallback', 'bind', 'verify')]
     [string]$Stage
 )
 
@@ -180,7 +180,11 @@ function Assert-SetAddress([string]$Name) {
 
 function Write-LabEnvLine {
     param([string]$Name, [string]$Value)
-    $allowed = @('D5_REACTIVE_ADDR', 'D5_CALLBACK_ADDR', 'D5_REACTIVE_FUND', 'D5_CALLBACK_FUND')
+    $allowed = @(
+        'D5_REACTIVE_ADDR', 'D5_CALLBACK_ADDR',
+        'D5_FAILED_REACTIVE_ADDR', 'D5_FAILED_CALLBACK_ADDR',
+        'D5_REACTIVE_FUND', 'D5_CALLBACK_FUND'
+    )
     if ($allowed -notcontains $Name) {
         Fail 'Refusing to write any .env key other than the D5 address and fund lines.'
     }
@@ -289,9 +293,10 @@ function Get-LiveNeed {
     $sepoliaPrice = $sepoliaBase * 2
     $oneGwei = [decimal]'1000000000'
     if ($sepoliaPrice -lt $oneGwei) { $sepoliaPrice = $oneGwei }
-    $sepoliaNeed = $callbackFund + (800000 * $sepoliaPrice)
+    # First real callback deploy used 2431043 gas. Lasna deploy used 852894 and bind used 80468.
+    $sepoliaNeed = $callbackFund + (2500000 * $sepoliaPrice)
     $lasnaPrice = $lasnaBase * 2
-    $lasnaNeed = $reactiveFund + (1320000 * $lasnaPrice)
+    $lasnaNeed = $reactiveFund + (1000000 * $lasnaPrice)
     Write-Host "Wallet $Wallet"
     Write-Host "D5_CALLBACK_FUND wei=$callbackFund"
     Write-Host "D5_REACTIVE_FUND wei=$reactiveFund"
@@ -338,7 +343,7 @@ function Invoke-Preflight {
         Fail 'Sepolia balance is below the callback fund plus deploy headroom. No transaction was sent.'
     }
     if ($live.LasnaBalance -lt $live.LasnaNeed) {
-        Fail 'Lasna balance is below the reactive fund plus deploy fee cap. No transaction was sent. Lower D5_REACTIVE_FUND or add lREACT.'
+        Fail 'Lasna balance is below D5_REACTIVE_FUND plus a 2x base-fee cap (900000 deploy gas + 100000 bind gas). No transaction was sent. The first pair of reacts spent about 0.034 lREACT. D5_REACTIVE_FUND=60000000000000000 (0.06 ether in wei) is the amount that fits this wallet at a 2x cap. Sending 0.01 ETH to the Sepolia faucet 0x9b9BB25f1A81078C544C829c5EB7822d747Cf434 buys 1 lREACT if you want to keep 0.10. Do not set a fee cap below 2x the current base fee.'
     }
     Write-Host 'Balance check passed. Compiling and testing. This does not broadcast.'
     Invoke-Tool 'forge' @('test', '--match-path', 'test/D5Cron.t.sol', '-vv') | Out-Null
@@ -427,8 +432,41 @@ Set-Location -LiteralPath $Starter
 $parsedEnv = Read-DotEnv
 Import-LabEnv $parsedEnv
 
+function Clear-LabEnvLine([string]$Name) {
+    Write-LabEnvLine -Name $Name -Value ''
+}
+
+function Invoke-PrepareRerun {
+    $reactive = Get-Address 'D5_REACTIVE_ADDR'
+    $callback = Get-Address 'D5_CALLBACK_ADDR'
+    if ([string]::IsNullOrWhiteSpace($reactive) -and [string]::IsNullOrWhiteSpace($callback)) {
+        Fail 'D5_REACTIVE_ADDR and D5_CALLBACK_ADDR are already empty. Nothing was moved.'
+    }
+    if (-not [string]::IsNullOrWhiteSpace((Get-Address 'D5_FAILED_REACTIVE_ADDR')) -or -not [string]::IsNullOrWhiteSpace((Get-Address 'D5_FAILED_CALLBACK_ADDR'))) {
+        Fail 'D5_FAILED_REACTIVE_ADDR or D5_FAILED_CALLBACK_ADDR already has a value. This script will not overwrite the saved failed deployment.'
+    }
+    $stamp = Get-Date -Format 'yyyyMMdd-HHmmss'
+    $src = Join-Path $Starter 'broadcast\DeployD5Cron.s.sol'
+    if (Test-Path -LiteralPath $src) {
+        $destRoot = Join-Path $Starter "broadcast\d5-archive\$stamp"
+        if (Test-Path -LiteralPath $destRoot) { Fail "Archive folder already exists: $destRoot" }
+        New-Item -ItemType Directory -Path $destRoot | Out-Null
+        Move-Item -LiteralPath $src -Destination (Join-Path $destRoot 'DeployD5Cron.s.sol')
+        Write-Host "Moved public receipts to broadcast\d5-archive\$stamp\DeployD5Cron.s.sol"
+    } else {
+        Write-Host 'No broadcast\DeployD5Cron.s.sol directory was present.'
+    }
+    if (-not [string]::IsNullOrWhiteSpace($reactive)) { Write-LabEnvLine -Name 'D5_FAILED_REACTIVE_ADDR' -Value $reactive }
+    if (-not [string]::IsNullOrWhiteSpace($callback)) { Write-LabEnvLine -Name 'D5_FAILED_CALLBACK_ADDR' -Value $callback }
+    Clear-LabEnvLine 'D5_REACTIVE_ADDR'
+    Clear-LabEnvLine 'D5_CALLBACK_ADDR'
+    Write-Host 'Cleared only D5_REACTIVE_ADDR and D5_CALLBACK_ADDR. Other .env keys were kept. cache was not read.'
+    Write-Host 'The failed callback cannot be reused: its reactive address is immutable. Deploy both contracts again.'
+}
+
 switch ($Stage) {
     'preflight' { Invoke-Preflight }
+    'prepareRerun' { Invoke-PrepareRerun }
     'deployReactive' { Invoke-DeployReactive }
     'deployCallback' { Invoke-DeployCallback }
     'bind' { Invoke-Bind }
