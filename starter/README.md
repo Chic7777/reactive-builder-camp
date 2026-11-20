@@ -79,7 +79,7 @@ Ping 到回调落地约 1 个区块。
 | 条件 | `react()` 里 `value < threshold` 那一行 |
 | 目标链动作 | `CampCallback.onEvent` 的函数体；payload 签名要同步改两边 |
 | 目标链换成 Base / Unichain Sepolia | `.env` 的 `DEST_CHAIN_ID`、`CALLBACK_PROXY`、`SEPOLIA_RPC_URL` |
-| 定时触发 | 订阅改成 Cron（见 cheatsheet 第 5 节） |
+| 定时触发 | D5 小实验：`../docs/d5-2026-11-20-cron.md`。新合约在 `src/d5/`，不改 CampOrigin / CampReactive / CampCallback |
 
 ## 4. 常见报错
 

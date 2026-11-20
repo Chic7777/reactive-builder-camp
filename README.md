@@ -5,6 +5,7 @@ ETHPanda × Reactive Network 两周共学（2026-11-16 → 11-29），对接 Rea
 - `starter/` — clone 即用的「事件 → react() → 回调」三步走模板（Foundry），已在 Sepolia ↔ Lasna 实测跑通
 - `docs/cheatsheet.md` — 网络 / 地址 / 费用 / Omni 写法速查表
 - `docs/faq.md` — 学员 FAQ
+- `docs/d5-2026-11-20-cron.md` — D5（11/20）定时任务：Cron100 → Sepolia，最多 2 次后退订
 
 报名：https://web3career.build/zh/programs/reactive-builder-camp
 黑客松：https://dorahacks.io/hackathon/reactive-omni-buildathon/detail
