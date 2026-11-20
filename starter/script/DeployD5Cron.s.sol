@@ -26,7 +26,7 @@ contract DeployD5Reactive is Script {
     function run() external {
         uint256 destChain = vm.envOr("DEST_CHAIN_ID", uint256(11155111));
         uint256 limit = vm.envOr("D5_MAX_EXECUTIONS", uint256(2));
-        uint256 fund = vm.envOr("D5_REACTIVE_FUND", uint256(0.15 ether));
+        uint256 fund = vm.envOr("D5_REACTIVE_FUND", uint256(0.10 ether));
 
         vm.startBroadcast(vm.envUint("PRIVATE_KEY"));
         D5CronReactive reactive = new D5CronReactive{ value: fund }(destChain, limit);
@@ -45,7 +45,7 @@ contract DeployD5Callback is Script {
     function run() external {
         address proxy = vm.envAddress("CALLBACK_PROXY");
         address reactive = vm.envAddress("D5_REACTIVE_ADDR");
-        uint256 fund = vm.envOr("D5_CALLBACK_FUND", uint256(0.02 ether));
+        uint256 fund = vm.envOr("D5_CALLBACK_FUND", uint256(0.002 ether));
         D5Guard.refuse(reactive);
         require(proxy != address(0), "CALLBACK_PROXY missing");
         require(fund > 0, "callback needs ETH for gas");

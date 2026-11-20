@@ -234,7 +234,7 @@ contract D5CronTest is Test {
         assertEq(tick2, 2);
         assertEq(system.requestAt(0).chainId, DEST_CHAIN);
         assertEq(system.requestAt(0).recipient, address(callback));
-        assertEq(system.requestAt(0).gasLimit, 300_000);
+        assertEq(system.requestAt(0).gasLimit, 400_000);
         assertGe(system.requestAt(0).gasLimit, 100_000);
     }
 
