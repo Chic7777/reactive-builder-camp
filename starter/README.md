@@ -80,6 +80,7 @@ Ping 到回调落地约 1 个区块。
 | 目标链动作 | `CampCallback.onEvent` 的函数体；payload 签名要同步改两边 |
 | 目标链换成 Base / Unichain Sepolia | `.env` 的 `DEST_CHAIN_ID`、`CALLBACK_PROXY`、`SEPOLIA_RPC_URL` |
 | 定时触发 | D5 小实验：`../docs/d5-2026-11-20-cron.md`。新合约在 `src/d5/`，不改 CampOrigin / CampReactive / CampCallback |
+| 两个教学池的价差 | Phase A：`../docs/spread-first-path.md`。合约在 `src/spread/`，脚本是 `script/spread-lab.ps1`。不复用上面三行的官方示例，也不复用 D5 |
 
 ## 4. 常见报错
 
