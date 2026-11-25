@@ -1,5 +1,7 @@
 # reactive-starter｜「事件 → react() → 回调」三步走模板
 
+`src/Camp*.sol` 是共学模板。这次要交的项目是 `src/signal/`：双向小信号唱片。部署用 `script/signal-lab.ps1`，说明在 `../docs/signal-first-path.md`。`src/spread/` 和 `src/d5/` 是更早的练习，留在这里，但不是提交路径。
+
 Clone 即用的最小 Reactive Omni 工程：三个合约 + 部署脚本 + 本地测试 + 链上核验脚本。跑通它，你就拿到了黑客松评审的第一道硬门槛——**链上可查的 Reactive 交易和它触发的回调**。
 
 ```
