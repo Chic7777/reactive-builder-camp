@@ -1,5 +1,23 @@
 # reactive-starter｜「事件 → react() → 回调」三步走模板
 
+`src/Camp*.sol` 是共学模板。这次要交的项目是 `src/signal/`：双向小信号唱片。部署用 `script/signal-lab.ps1`，说明在 `../docs/signal-first-path.md`。`src/spread/` 和 `src/d5/` 是更早的练习，留在这里，但不是提交路径。三笔链上交易尚未上链，这里不编造哈希。
+
+## 出问题怎么办
+
+三条保护：
+
+1. 只有两个不同的地址在时间窗里都发出信号，才会触发回调。
+2. 同一个钱包挥两次不会解锁。同一对地址、同一个房间、同样的两个时间也不会解锁第二次。
+3. 相遇次数有上限，默认 3 次，最多 5 次。Reactive 合约预存 0.10 lREACT。次数或这笔预算用完，就退订并停下来。
+
+欠款时，给合约转测试币，或调用 `coverDebt()`。目标链回调失败也收费，所以「这次不用记」用 return，不用 revert。
+
+完整的失败表在 [`docs/signal-first-path.md`](../docs/signal-first-path.md) 的「失败时会发生什么」。本地测试是 [`starter/test/SignalPath.t.sol`](test/SignalPath.t.sol)。
+
+```bash
+cd starter && forge test --match-path test/SignalPath.t.sol --evm-version cancun -vv
+```
+
 Clone 即用的最小 Reactive Omni 工程：三个合约 + 部署脚本 + 本地测试 + 链上核验脚本。跑通它，你就拿到了黑客松评审的第一道硬门槛——**链上可查的 Reactive 交易和它触发的回调**。
 
 ```

@@ -24,18 +24,20 @@ contract D5CallbackGasForkTest is Test {
     uint256 constant PROXY_FRAME_GAS = 382552;
 
     function setUp() public {
-        vm.createSelectFork(
-            vm.envOr("D5_SEPOLIA_FORK_URL", string("https://ethereum-sepolia-rpc.publicnode.com")),
-            12_175_552
-        );
         SstorePriceProbe probe = new SstorePriceProbe();
         uint256 before = gasleft();
         probe.store();
         // Cancun 的冷 SSTORE 大约 2 万 gas。Amsterdam 大约 10 万。
         // 默认 cancun 套件不能复现这次 out of gas，所以跳过，而不是当成通过。
+        // 先判断再分叉：公开节点已经修剪掉固定区块 12175552 时，cancun 套件不该在 setUp 里失败。
         if (before - gasleft() < 50_000) {
             vm.skip(true, "forge test --evm-version amsterdam --match-path test/D5CallbackGas.t.sol");
+            return;
         }
+        vm.createSelectFork(
+            vm.envOr("D5_SEPOLIA_FORK_URL", string("https://ethereum-sepolia-rpc.publicnode.com")),
+            12_175_552
+        );
     }
 
     function test_fork_oldCallback_outOfGasThroughRealProxy() public {

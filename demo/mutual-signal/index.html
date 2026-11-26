@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>双向小信号唱片</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --paper: #f4efe6;
+      --ink: #2b2420;
+      --muted: #6d6258;
+      --seal: #8d3d34;
+      --line: #e4d8c8;
+      --card: #fffaf3;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: "Palatino Linotype", Palatino, "Songti SC", "STSong", "SimSun", serif;
+      line-height: 1.7;
+    }
+    main { max-width: 42rem; margin: 0 auto; padding: 2.5rem 1.25rem 4rem; }
+    h1 { font-size: 2rem; font-weight: 500; letter-spacing: 0.04em; margin: 0 0 0.25rem; }
+    .en { color: var(--muted); margin: 0 0 1.5rem; font-size: 0.95rem; }
+    p { margin: 0.8rem 0; }
+    button, input {
+      font: inherit;
+      color: inherit;
+    }
+    button {
+      background: var(--ink);
+      color: var(--paper);
+      border: 0;
+      border-radius: 999px;
+      padding: 0.7rem 1.2rem;
+      cursor: pointer;
+    }
+    button.ghost {
+      background: transparent;
+      color: var(--ink);
+      border: 1px solid var(--ink);
+    }
+    button:disabled { opacity: 0.45; cursor: not-allowed; }
+    .row { display: flex; flex-wrap: wrap; gap: 0.75rem; margin: 1rem 0; }
+    .banner {
+      border: 1px solid var(--line);
+      background: var(--card);
+      border-radius: 1rem;
+      padding: 0.9rem 1rem;
+      color: var(--muted);
+    }
+    .banner strong { color: var(--seal); font-weight: 600; }
+    .status { min-height: 1.5rem; color: var(--muted); }
+    figure { margin: 1.5rem 0; text-align: center; }
+    img { width: min(100%, 22rem); height: auto; border-radius: 1.5rem; }
+    img.spin { animation: turn 28s linear infinite; }
+    @keyframes turn { to { transform: rotate(360deg); } }
+    blockquote {
+      margin: 0;
+      padding: 0.25rem 0 0.25rem 1rem;
+      border-left: 2px solid var(--seal);
+      font-size: 1.15rem;
+    }
+    audio { width: min(100%, 22rem); margin-top: 0.8rem; }
+    section { margin-top: 2.5rem; }
+    h2 { font-size: 1.25rem; font-weight: 500; }
+    label { display: block; margin: 0.8rem 0 0.3rem; color: var(--muted); }
+    input {
+      width: 100%;
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 0.7rem;
+      padding: 0.65rem 0.8rem;
+    }
+    code { font-family: ui-monospace, "Cascadia Mono", Consolas, monospace; font-size: 0.82rem; word-break: break-all; }
+    .hidden { display: none; }
+    footer { margin-top: 2.5rem; color: var(--muted); font-size: 0.92rem; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>双向小信号唱片</h1>
+    <p class="en">Mutual Signal Record</p>
+    <p>两个人各自在测试网上挥一下手。如果这两下落在同一个小时里，链上就记下一次相遇。然后这张网页放出一张图、一首短诗，和一声很短的提示音。</p>
+    <p>链上没有名字，没有句子，也没有私人笔记。房间号只是一段暗号的哈希。诗、图片和声音都在这个网页里，不写进合约。</p>
+
+    <section>
+      <h2>预览</h2>
+      <div class="banner" id="preview-banner">
+        <strong>预览模式，链下。</strong>
+        下面两下挥手发生在这台浏览器里，不会发交易，也不是链上记录。时间窗用的是这台电脑的时钟，默认一小时。
+      </div>
+      <p>房间暗号 <code id="room-label">mutual-signal</code></p>
+      <p>链上的 pairId 是这段暗号的 keccak256：<br><code id="pair-label">0x23365b7b7f9f4867a6d0a355957e84dec93920a11d04b48ab7789415b30b55b6</code></p>
+      <div class="row">
+        <button type="button" id="wave-a">我发出小信号</button>
+        <button type="button" id="wave-b">对方也发出小信号</button>
+        <button type="button" class="ghost" id="reset">重新开始</button>
+      </div>
+      <p class="status" id="preview-status">两个人都还没挥手。</p>
+      <div id="record" class="hidden">
+        <figure>
+          <img src="assets/record.svg" alt="一张手绘的小唱片，盘面上有两粒浅色的光" id="disc">
+          <figcaption>图是为这个演示画的，不是别人的作品。</figcaption>
+        </figure>
+        <blockquote>
+          <p>我把一粒光放在测试网上。<br>没有写下你的名字。</p>
+          <p>你如果也把一粒光放在同一个暗号里，<br>并且两粒光落在同一个小时，<br>这张唱片就转一下。</p>
+          <p>它记不住句子。<br>它只记得：你也来过。</p>
+        </blockquote>
+        <audio id="chime" controls preload="auto" src="assets/chime.wav"></audio>
+        <p class="status">这一声是仓库里生成的正弦波，大约 0.8 秒，没有歌词，也不是现成的歌。如果浏览器拦住了自动播放，点一下播放器就行。</p>
+      </div>
+    </section>
+
+    <section>
+      <h2>链上唱片</h2>
+      <p>部署完成之后，把 Sepolia 上的 EncounterLedger 地址填进来。计数大于 0，就说明回调已经把相遇写进那个存储槽。图、诗和声音仍然来自这个网页。</p>
+      <label for="ledger">EncounterLedger 地址</label>
+      <input id="ledger" autocomplete="off" placeholder="0x..." spellcheck="false">
+      <label for="rpc">Sepolia RPC</label>
+      <input id="rpc" autocomplete="off" value="https://ethereum-sepolia-rpc.publicnode.com" spellcheck="false">
+      <div class="row">
+        <button type="button" id="read-chain">读取 Sepolia</button>
+        <button type="button" class="ghost" id="send-chain">用当前钱包发一次信号</button>
+      </div>
+      <p class="status" id="chain-status">还没有读取。</p>
+      <div class="banner hidden" id="chain-banner"></div>
+    </section>
+
+    <footer>
+      <p>源链和目标链都是 Ethereum Sepolia。判断发生在 Lasna。同一个人发两次不算相遇。这是测试网演示，不是承诺，也不是社交网络。</p>
+    </footer>
+  </main>
+  <script>
+    const PAIR_ID = "0x23365b7b7f9f4867a6d0a355957e84dec93920a11d04b48ab7789415b30b55b6";
+    const WINDOW_MS = 3600 * 1000;
+    const COUNT_SELECTOR = "0x06661abd";
+    const EARLIER_SELECTOR = "0x1ef2191a";
+    const LATER_SELECTOR = "0xa4a7cfd3";
+    const SEND_SELECTOR = "0x66ca2bc0";
+    const SEPOLIA_CHAIN = "0xaa36a7";
+    const waves = { a: 0, b: 0 };
+    let chainUnlocked = false;
+
+    const previewStatus = document.getElementById("preview-status");
+    const record = document.getElementById("record");
+    const disc = document.getElementById("disc");
+    const chime = document.getElementById("chime");
+    const chainStatus = document.getElementById("chain-status");
+    const chainBanner = document.getElementById("chain-banner");
+
+    function met() {
+      if (!waves.a || !waves.b) return false;
+      return Math.abs(waves.a - waves.b) <= WINDOW_MS;
+    }
+
+    function render(play) {
+      const a = waves.a ? "我已经挥过手" : "我还没挥手";
+      const b = waves.b ? "对方已经挥过手" : "对方还没挥手";
+      if (met()) {
+        previewStatus.textContent = chainUnlocked
+          ? "账本的 count 大于 0，所以这里打开了网页里的唱片。图、诗和声音不在合约里。"
+          : "两下都在一小时里。这是浏览器里的预览，不是链上记录。";
+        record.classList.remove("hidden");
+        disc.classList.add("spin");
+        if (play) {
+          chime.currentTime = 0;
+          chime.play().catch(function () {});
+        }
+        return;
+      }
+      record.classList.add("hidden");
+      disc.classList.remove("spin");
+      chime.pause();
+      if (waves.a && waves.b) {
+        previewStatus.textContent = a + "，" + b + "。两下隔得超过一小时，这一次没有遇见。可以再挥一次。";
+      } else {
+        previewStatus.textContent = a + "，" + b + "。";
+      }
+    }
+
+    function showPreviewBanner() {
+      document.getElementById("preview-banner").innerHTML = "<strong>预览模式，链下。</strong> 下面两下挥手发生在这台浏览器里，不会发交易，也不是链上记录。时间窗用的是这台电脑的时钟，默认一小时。";
+    }
+    document.getElementById("wave-a").addEventListener("click", function () {
+      chainUnlocked = false;
+      showPreviewBanner();
+      waves.a = Date.now();
+      render(met());
+    });
+    document.getElementById("wave-b").addEventListener("click", function () {
+      chainUnlocked = false;
+      showPreviewBanner();
+      waves.b = Date.now();
+      render(met());
+    });
+    document.getElementById("reset").addEventListener("click", function () {
+      chainUnlocked = false;
+      waves.a = 0;
+      waves.b = 0;
+      showPreviewBanner();
+      render(false);
+    });
+
+    function hexToBig(hex) {
+      if (!hex || hex === "0x") return 0n;
+      return BigInt(hex);
+    }
+
+    async function rpc(method, params) {
+      const url = document.getElementById("rpc").value.trim();
+      const response = await fetch(url, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ jsonrpc: "2.0", id: 1, method: method, params: params })
+      });
+      const body = await response.json();
+      if (body.error) throw new Error(body.error.message || "RPC error");
+      return body.result;
+    }
+
+    async function readUint(to, data) {
+      const result = await rpc("eth_call", [{ to: to, data: data }, "latest"]);
+      return hexToBig(result);
+    }
+
+    document.getElementById("read-chain").addEventListener("click", async function () {
+      const ledger = document.getElementById("ledger").value.trim();
+      chainBanner.classList.add("hidden");
+      if (!/^0x[0-9a-fA-F]{40}$/.test(ledger)) {
+        chainStatus.textContent = "请先填 20 字节的账本地址。部署之前可以继续用上面的预览。";
+        return;
+      }
+      chainStatus.textContent = "正在读 Sepolia…";
+      try {
+        const count = await readUint(ledger, COUNT_SELECTOR);
+        const earlier = await readUint(ledger, EARLIER_SELECTOR);
+        const later = await readUint(ledger, LATER_SELECTOR);
+        if (count === 0n) {
+          chainStatus.textContent = "这个账本的 count 还是 0。回调可能还在路上，或者两个人还没在时间窗里都挥手。";
+          return;
+        }
+        chainStatus.textContent = "count = " + count.toString() + "。较早的信号时间 " + earlier.toString() + "，较晚的 " + later.toString() + "。这两个数是 Sepolia 的区块时间。";
+        chainBanner.classList.remove("hidden");
+        chainBanner.textContent = "链上已经记下相遇。打开的唱片、诗和声音仍然是这个网页的，不在合约里。";
+        document.getElementById("preview-banner").innerHTML = "<strong>链上记录已读到。</strong> 图、诗和声音仍是这个网页里的，不是合约里的数据。";
+        chainUnlocked = true;
+        waves.a = Date.now();
+        waves.b = Date.now();
+        render(true);
+      } catch (error) {
+        chainStatus.textContent = "没有读到。浏览器可能拦住了 RPC，或者地址还没有合约。预览模式不依赖这条读取。 " + (error && error.message ? error.message : "");
+      }
+    });
+
+    document.getElementById("send-chain").addEventListener("click", async function () {
+      const board = window.prompt("SignalBoard 的 Sepolia 地址", "");
+      if (!board) return;
+      if (!/^0x[0-9a-fA-F]{40}$/.test(board.trim())) {
+        chainStatus.textContent = "信号板地址不是 20 字节。没有发交易。";
+        return;
+      }
+      if (!window.ethereum) {
+        chainStatus.textContent = "这个浏览器里没有钱包。请用 signal-lab.ps1 发信号。同一个人发两次不会相遇。";
+        return;
+      }
+      try {
+        const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
+        const from = accounts[0];
+        const chainId = await window.ethereum.request({ method: "eth_chainId" });
+        if (chainId.toLowerCase() !== SEPOLIA_CHAIN) {
+          chainStatus.textContent = "当前钱包不是 Ethereum Sepolia。没有发交易。";
+          return;
+        }
+        chainStatus.textContent = "请在钱包里确认。这一下只代表当前账户。第二下要换另一个账户。";
+        const hash = await window.ethereum.request({
+          method: "eth_sendTransaction",
+          params: [{
+            from: from,
+            to: board.trim(),
+            data: SEND_SELECTOR + PAIR_ID.slice(2)
+          }]
+        });
+        chainStatus.textContent = "已提交 " + hash + "。这是钱包返回的哈希，不是脚本编的。等另一人也发过之后，再读取账本。";
+      } catch (error) {
+        chainStatus.textContent = "没有发出去。 " + (error && error.message ? error.message : "");
+      }
+    });
+  </script>
+</body>
+</html>
