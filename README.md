@@ -39,6 +39,22 @@ Web page shows image / poem / short music
 
 两个人必须是两个地址。同一个人发两次不会相遇。部署和本地测试见 `docs/signal-first-path.md`。三笔链上交易要等本机用 gitignored `.env` 跑完 `starter/script/signal-lab.ps1` 再填，这里不编造哈希。
 
+## 出问题怎么办
+
+三条保护：
+
+1. 只有两个不同的地址在时间窗里都发出信号，才会触发回调。
+2. 同一个钱包挥两次不会解锁。同一对地址、同一个房间、同样的两个时间也不会解锁第二次。
+3. 相遇次数有上限，默认 3 次，最多 5 次。Reactive 合约预存 0.10 lREACT。次数或这笔预算用完，就退订并停下来。
+
+欠款时，给合约转测试币，或调用 `coverDebt()`。目标链回调失败也收费，所以「这次不用记」用 return，不用 revert。
+
+完整的失败表在 [`docs/signal-first-path.md`](docs/signal-first-path.md) 的「失败时会发生什么」。本地测试是 [`starter/test/SignalPath.t.sol`](starter/test/SignalPath.t.sol)。
+
+```bash
+cd starter && forge test --match-path test/SignalPath.t.sol --evm-version cancun -vv
+```
+
 ## 更早的练习（留在仓库里，不是这次要交的项目）
 
 ### Phase A 价差路径（教学模拟，非真实市场）
