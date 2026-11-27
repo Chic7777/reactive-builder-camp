@@ -42,7 +42,7 @@ contract ClarityReactive is AbstractReactive {
     uint256 public immutable ORIGIN_CHAIN_ID;
     address public immutable ORIGIN_CONTRACT;
     uint256 public immutable DEST_CHAIN_ID;
-    /// @notice 无 touch 多久后彻底放下，单位秒。演示默认 1800（30 分钟）。
+    /// @notice 无 touch 多久后彻底放下，单位秒。录 demo 默认 300（5 分钟）；正式约 3 天。
     uint256 public immutable WINDOW;
     /// @notice 每次 Cron tick 最多检查几团，防止单次 react 过重。
     uint256 public immutable CRON_CAP;

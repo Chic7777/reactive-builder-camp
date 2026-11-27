@@ -191,7 +191,7 @@ function Import-LabEnv($Parsed) {
     if (-not $env:CALLBACK_PROXY) { $env:CALLBACK_PROXY = $ProxyDefault }
     if (-not $env:CALENDAR_REACTIVE_FUND) { $env:CALENDAR_REACTIVE_FUND = [string]$DefaultReactiveFund }
     if (-not $env:CALENDAR_FUND) { $env:CALENDAR_FUND = [string]$DefaultCalendarFund }
-    if (-not $env:CALENDAR_WINDOW) { $env:CALENDAR_WINDOW = '1800' }
+    if (-not $env:CALENDAR_WINDOW) { $env:CALENDAR_WINDOW = '300' }
     if (-not $env:CALENDAR_CRON_CAP) { $env:CALENDAR_CRON_CAP = '8' }
     $env:CALENDAR_REACTIVE_FUND = [string](Convert-ToWei 'CALENDAR_REACTIVE_FUND' $env:CALENDAR_REACTIVE_FUND)
     $env:CALENDAR_FUND = [string](Convert-ToWei 'CALENDAR_FUND' $env:CALENDAR_FUND)
@@ -231,7 +231,7 @@ function Assert-CalendarConfig {
     $window = [decimal]$env:CALENDAR_WINDOW
     $cap = [decimal]$env:CALENDAR_CRON_CAP
     if ($window -ne [decimal]::Floor($window) -or $window -lt 1) {
-        Fail 'CALENDAR_WINDOW must be a positive whole number of seconds. Demo default is 1800 (30 minutes). Real-life docs suggest 3 days.'
+        Fail 'CALENDAR_WINDOW must be a positive whole number of seconds. Demo recording default is 300 (5 minutes). Real-life docs suggest about 3 days (259200).'
     }
     if ($cap -ne [decimal]::Floor($cap) -or $cap -lt 1 -or $cap -gt 32) {
         Fail 'CALENDAR_CRON_CAP must be a whole number from 1 to 32.'

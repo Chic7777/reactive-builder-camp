@@ -3,7 +3,7 @@
     zh: {
       brand: "恋爱脑清醒日历",
       brandEn: "Love-Brain Clarity Calendar",
-      lead: "一张软软的月历，安静见证你把恋爱脑念头放下，继续好好生活。日记只留在这台浏览器里。",
+      lead: "一张软软的月历，安静见证你把恋爱脑念头放下，继续好好生活。",
       living: "恭喜你，依旧在好好生活",
       livingStrong: "恭喜你，依旧在好好生活 · 越来越多格子安静了",
       demo: "进入演示模式",
@@ -14,34 +14,30 @@
       write: "写下今天",
       linkQ: "这次和之前哪一天有关？",
       fresh: "全新的一件事",
-      save: "保存到本地",
+      save: "保存",
       pledge: "我愿意彻底放下，继续好好生活",
-      demoRelease: "演示：标记彻底放下",
+      fastFwd: "⏩ 时间快进",
       needText: "先写一点再保存。",
-      saved: "已保存到浏览器。正文不会上链。",
-      pickLink: "从第二条起，请选择关联的日子，或选「全新的一件事」。",
+      saved: "已保存。",
+      pickLink: "请选择关联的日子，或选「全新的一件事」。",
       oracleTitle: "毒舌神谕",
-      chainHint: "演示模式不上链；连接钱包并填写合约后才会发 touch / pledge。",
-      noContract: "还没有填写合约地址：可继续演示。部署后写入 app/config.js。",
-      txTouch: "已发送 touch / link",
-      txPledge: "已发送放下承诺",
-      demoEntered: "已进入演示模式。点格子写日记，或先「填入示例数据」。",
-      seeded: "已填入示例：粉色纠缠团 + 平静已放下团。点今天可继续写。",
-      pledgedDemo: "演示：已记下放下承诺。可立刻点「标记彻底放下」看格子变平静。",
-      releasedDemo: "演示：这团已彻底放下，格子变平静。",
+      noContract: "还没有合约地址，可先演示。",
+      txTouch: "已发送",
+      txPledge: "已承诺放下",
+      demoEntered: "演示模式已开启。",
+      seeded: "已填入示例。",
+      pledgedDemo: "已记下放下的心愿。",
+      fastForwarded: "时间快进：已承诺的团变平静了。",
+      fastForwardEmpty: "没有待放下的承诺。",
       badge: "演示中",
-      tapHint: "点某一天写下恋爱脑",
-      entryLabel: "日记只存本机浏览器 · 永不上传",
-      close: "关闭",
-      foot: "赛道 2 · 测试网 · 运行时无 AI · 正文只在本机",
-      noEthers: "钱包库未加载，请用演示模式（无需联网 CDN）。",
+      noEthers: "钱包不可用，请用演示模式。",
       noMeta: "未检测到 MetaMask，请用演示模式。",
       week: ["一", "二", "三", "四", "五", "六", "日"]
     },
     en: {
       brand: "Love-Brain Clarity Calendar",
       brandEn: "恋爱脑清醒日历",
-      lead: "A soft month view that quietly witnesses you letting go. Diary text stays in this browser only.",
+      lead: "A soft month view that quietly witnesses you letting go and living well.",
       living: "Congrats, you're still living well",
       livingStrong: "Congrats, you're still living well · more quiet squares now",
       demo: "Enter demo mode",
@@ -52,34 +48,29 @@
       write: "Write this day",
       linkQ: "Which earlier day is this about?",
       fresh: "A brand-new thing",
-      save: "Save locally",
+      save: "Save",
       pledge: "I choose to let go and keep living well",
-      demoRelease: "Demo: mark released",
+      fastFwd: "⏩ Fast-forward",
       needText: "Write something first.",
-      saved: "Saved in the browser. Text never goes on-chain.",
-      pickLink: "From the second entry on, pick related days or 'brand-new'.",
+      saved: "Saved.",
+      pickLink: "Pick related days or 'brand-new'.",
       oracleTitle: "Sassy oracle",
-      chainHint: "Demo stays off-chain. Wallet + contract address needed for txs.",
-      noContract: "No contract address yet—demo still works. Set app/config.js after deploy.",
-      txTouch: "Sent touch / link",
-      txPledge: "Sent let-go pledge",
-      demoEntered: "Demo mode on. Tap a day to write, or load sample data.",
-      seeded: "Sample loaded: pink linked thread + one calm released thread.",
-      pledgedDemo: "Demo pledge saved. Tap “mark released” to calm the cells.",
-      releasedDemo: "Demo: thread released; cells calmed.",
+      noContract: "No contract address yet—demo still works.",
+      txTouch: "Sent",
+      txPledge: "Pledge sent",
+      demoEntered: "Demo mode on.",
+      seeded: "Sample loaded.",
+      pledgedDemo: "Let-go wish noted.",
+      fastForwarded: "Fast-forward: pledged threads calmed.",
+      fastForwardEmpty: "Nothing waiting to release.",
       badge: "Demo",
-      tapHint: "Tap a day to write",
-      entryLabel: "Diary stays in this browser only",
-      close: "Close",
-      foot: "Track 2 · testnet · no runtime AI · text stays local",
-      noEthers: "Wallet library missing—use demo mode (no CDN needed).",
+      noEthers: "Wallet unavailable—use demo mode.",
       noMeta: "No MetaMask—use demo mode.",
       week: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
     }
   };
 
   const state = ClarityStorage.load();
-  // 双击打开时默认视为可演示；显式点按钮会强化 UI
   if (typeof state.demo !== "boolean") state.demo = true;
 
   let view = new Date();
@@ -120,23 +111,23 @@
 
   function toast(msg) {
     const el = $("toast");
-    if (!el) return;
+    if (!el || !msg) return;
     el.textContent = msg;
     el.hidden = false;
     clearTimeout(toastTimer);
     toastTimer = setTimeout(function () {
       el.hidden = true;
-    }, 2800);
-  }
-
-  function setStatus(msg) {
-    setText("status", msg || "");
-    if (msg) toast(msg);
+    }, 2600);
   }
 
   function bgFile(category) {
     const map = (window.ClarityConfig && ClarityConfig.backgrounds) || {};
     return map[category] || map.fallback || "fallback.svg";
+  }
+
+  function isSheetOpen() {
+    const panel = $("panel");
+    return !!(panel && !panel.hidden);
   }
 
   function applyPalette() {
@@ -152,9 +143,10 @@
     setText("livingWell", calmness > 0.45 ? t().livingStrong : t().living);
   }
 
-  function paintDemoBadge() {
+  function paintDemoChrome() {
     const badge = $("demoBadge");
     const btn = $("btnDemo");
+    const fast = $("btnFastForward");
     if (badge) {
       badge.hidden = !state.demo;
       badge.textContent = t().badge;
@@ -163,8 +155,13 @@
       btn.textContent = state.demo ? t().demoOn : t().demo;
       btn.classList.toggle("is-demo", !!state.demo);
     }
+    if (fast) {
+      fast.hidden = !state.demo;
+      fast.textContent = t().fastFwd;
+    }
   }
 
+  // 翻月 / 语言切换只重绘月历，绝不打开弹层。
   function paintUI() {
     const copy = t();
     setHtml("brand", copy.brand + "<span>" + copy.brandEn + "</span>");
@@ -173,13 +170,8 @@
     setText("btnConnect", walletAddr ? (copy.connected + ": " + walletAddr.slice(0, 6) + "…") : copy.connect);
     setText("btnSave", copy.save);
     setText("btnPledge", copy.pledge);
-    setText("btnDemoRelease", copy.demoRelease);
     setText("oracleLabel", copy.oracleTitle);
-    setText("chainHint", copy.chainHint);
-    setText("tapHint", copy.tapHint);
-    setText("entryLabel", copy.entryLabel);
-    setText("footerNote", copy.foot);
-    paintDemoBadge();
+    paintDemoChrome();
 
     const zh = $("langZh");
     const en = $("langEn");
@@ -188,7 +180,7 @@
 
     renderMonth();
     applyPalette();
-    if (selected) openDay(selected, false);
+    if (selected && isSheetOpen()) fillDayPanel(selected);
   }
 
   function renderMonth() {
@@ -260,11 +252,9 @@
     document.body.classList.remove("sheet-open");
   }
 
-  function openDay(key, focus) {
-    selected = key;
+  function fillDayPanel(key) {
     const copy = t();
     const entry = state.entries[key];
-    openSheet();
     setText("panelTitle", copy.write + " · " + key);
     const ta = $("entryText");
     if (ta) ta.value = entry ? entry.text : "";
@@ -302,10 +292,14 @@
       const bg = $("panelBg");
       if (bg) bg.style.backgroundImage = "";
     }
+  }
 
-    if (focus && ta) {
-      setTimeout(function () { ta.focus(); }, 180);
-    }
+  function openDay(key, focus) {
+    selected = key;
+    openSheet();
+    fillDayPanel(key);
+    const ta = $("entryText");
+    if (focus && ta) setTimeout(function () { ta.focus(); }, 160);
   }
 
   function showOracle(text, entry) {
@@ -347,7 +341,7 @@
     const ta = $("entryText");
     const text = ta ? ta.value.trim() : "";
     if (!text) {
-      setStatus(copy.needText);
+      toast(copy.needText);
       return;
     }
     const isNew = !state.entries[selected];
@@ -355,7 +349,7 @@
     if (isNew && Object.keys(state.entries).length > 0) {
       linked = collectLinks(selected);
       if (linked === null) {
-        setStatus(copy.pickLink);
+        toast(copy.pickLink);
         return;
       }
     } else if (!isNew) {
@@ -389,16 +383,16 @@
     };
     ClarityStorage.save(state);
     showOracle(text, state.entries[selected]);
-    setStatus(copy.saved);
+    toast(copy.saved);
     paintUI();
-    openDay(selected, false);
+    if (isSheetOpen()) fillDayPanel(selected);
 
     if (canUseChain()) {
       try {
         await chainTouchForDay(selected);
-        setStatus(copy.saved + " · " + copy.txTouch);
+        toast(copy.saved + " · " + copy.txTouch);
       } catch (e) {
-        setStatus(copy.saved + " · " + (e.shortMessage || e.message || String(e)));
+        toast(copy.saved + " · " + (e.shortMessage || e.message || String(e)));
       }
     }
   }
@@ -425,7 +419,7 @@
   async function pledge() {
     const copy = t();
     if (!selected || !state.entries[selected]) {
-      setStatus(copy.needText);
+      toast(copy.needText);
       return;
     }
     const group = ClarityGraph.threadDays(state.entries, selected);
@@ -435,37 +429,44 @@
     ClarityStorage.save(state);
 
     if (state.demo || !canUseChain()) {
-      setStatus(copy.pledgedDemo);
+      toast(copy.pledgedDemo);
       paintUI();
-      openDay(selected, false);
+      if (isSheetOpen()) fillDayPanel(selected);
       return;
     }
     try {
       let id = state.entries[selected].chainThreadId;
       if (!id) id = await chainTouchForDay(selected);
       await ClarityWallet.pledgeLetGo(id);
-      setStatus(copy.txPledge);
+      toast(copy.txPledge);
     } catch (e) {
-      setStatus(e.shortMessage || e.message || String(e));
+      toast(e.shortMessage || e.message || String(e));
     }
     paintUI();
-    openDay(selected, false);
+    if (isSheetOpen()) fillDayPanel(selected);
   }
 
-  function demoRelease() {
+  // 演示：把已承诺、尚未平静的团当作窗口到期，全部变平静。
+  function fastForward() {
+    if (!state.demo) return;
     const copy = t();
-    if (!selected || !state.entries[selected]) {
-      setStatus(copy.needText);
-      return;
-    }
-    const group = ClarityGraph.threadDays(state.entries, selected);
-    group.forEach(function (d) {
-      if (state.entries[d]) state.entries[d].released = true;
+    let touched = 0;
+    Object.keys(state.entries).forEach(function (k) {
+      const e = state.entries[k];
+      if (e && e.pledged && !e.released) {
+        const group = ClarityGraph.threadDays(state.entries, k);
+        group.forEach(function (d) {
+          if (state.entries[d] && !state.entries[d].released) {
+            state.entries[d].released = true;
+            touched += 1;
+          }
+        });
+      }
     });
     ClarityStorage.save(state);
-    setStatus(copy.releasedDemo);
     paintUI();
-    openDay(selected, false);
+    if (selected && isSheetOpen()) fillDayPanel(selected);
+    toast(touched ? copy.fastForwarded : copy.fastForwardEmpty);
   }
 
   function enterDemo(opts) {
@@ -475,9 +476,8 @@
     ClarityStorage.save(state);
     view = new Date();
     paintUI();
-    const today = dayKey(new Date());
-    openDay(today, !!opts.focus);
-    setStatus(t().demoEntered);
+    if (opts.focus) openDay(dayKey(new Date()), true);
+    toast(t().demoEntered);
   }
 
   function makeEntry(key, text, extra) {
@@ -504,16 +504,9 @@
     const d2 = shiftDay(today, -3);
     const d3 = shiftDay(today, -2);
     const calm = shiftDay(today, -8);
-    // 一团纠缠：d1-d2-d3 相连；另有一团已彻底放下
     state.entries = {};
-    state.entries[d1] = makeEntry(d1, "他已读不回，是不是不爱我了", {
-      threadLocalId: 1,
-      linkedDays: []
-    });
-    state.entries[d2] = makeEntry(d2, "想主动发消息，又怕显得很着急", {
-      threadLocalId: 1,
-      linkedDays: [d1]
-    });
+    state.entries[d1] = makeEntry(d1, "他已读不回，是不是不爱我了", { threadLocalId: 1, linkedDays: [] });
+    state.entries[d2] = makeEntry(d2, "想主动发消息，又怕显得很着急", { threadLocalId: 1, linkedDays: [d1] });
     state.entries[d3] = makeEntry(d3, "看到他朋友圈，有点嫉妒", {
       threadLocalId: 1,
       linkedDays: [d1, d2],
@@ -531,26 +524,25 @@
     ClarityStorage.save(state);
     view = new Date();
     paintUI();
-    openDay(dayKey(today), true);
-    setStatus(t().seeded);
+    toast(t().seeded);
   }
 
   async function connect() {
     const copy = t();
     if (!window.ClarityWallet || !ClarityWallet.ethersReady()) {
-      setStatus(copy.noEthers);
+      toast(copy.noEthers);
       return;
     }
     try {
       walletAddr = await ClarityWallet.connect(ClarityConfig);
       state.demo = false;
       ClarityStorage.save(state);
-      setStatus(ClarityConfig.calendarAddress ? copy.connected : copy.noContract);
+      toast(ClarityConfig.calendarAddress ? copy.connected : copy.noContract);
       paintUI();
     } catch (e) {
-      if (e.message === "NO_METAMASK") setStatus(copy.noMeta);
-      else if (e.message === "NO_ETHERS") setStatus(copy.noEthers);
-      else setStatus(e.message || String(e));
+      if (e.message === "NO_METAMASK") toast(copy.noMeta);
+      else if (e.message === "NO_ETHERS") toast(copy.noEthers);
+      else toast(e.message || String(e));
     }
   }
 
@@ -583,7 +575,7 @@
     on("btnConnect", "click", function () { connect(); });
     on("btnSave", "click", function () { saveEntry(); });
     on("btnPledge", "click", function () { pledge(); });
-    on("btnDemoRelease", "click", function () { demoRelease(); });
+    on("btnFastForward", "click", function () { fastForward(); });
     on("btnCloseSheet", "click", function () { closeSheet(); });
     on("sheetBackdrop", "click", function () { closeSheet(); });
     on("entryText", "input", function () {
@@ -598,11 +590,8 @@
       const e = state.entries[k];
       if (e && e.threadLocalId && e.threadLocalId >= localThreadSeq) localThreadSeq = e.threadLocalId + 1;
     });
-    // 不 fetch；背景来自 ClarityConfig.backgrounds
     bind();
     paintUI();
-    // 首次打开：若已是演示偏好，显示徽章但不强制弹层；用户点演示才弹
-    if (state.demo) paintDemoBadge();
   }
 
   if (document.readyState === "loading") {

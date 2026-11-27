@@ -68,7 +68,7 @@ contract DeployCalendarReactive is CalendarScript {
         uint256 originChain = vm.envOr("ORIGIN_CHAIN_ID", uint256(11155111));
         address origin = vm.envAddress("CALENDAR_ADDR");
         uint256 destChain = vm.envOr("DEST_CHAIN_ID", uint256(11155111));
-        uint256 window = vm.envOr("CALENDAR_WINDOW", uint256(1800));
+        uint256 window = vm.envOr("CALENDAR_WINDOW", uint256(300));
         uint256 cronCap = vm.envOr("CALENDAR_CRON_CAP", uint256(8));
         uint256 fund = vm.envOr("CALENDAR_REACTIVE_FUND", uint256(0.05 ether));
         _refuseKnown(origin);

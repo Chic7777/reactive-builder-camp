@@ -7,7 +7,7 @@
 | 误把 D5 / Camp / Signal 地址当日历 | 脚本 Fail：points at official/D5 或 matches another lab | 只用新的 `CALENDAR_*` 地址 |
 | 还没 bind 就 pledge | DemoPledge 提示 reactive not bound | 先跑 `-Stage bind`（Sepolia bindReactive + Lasna setRecipient） |
 | 日记出现在链上？ | 不会 | 合约没有日记字段；正文只在 `localStorage` |
-| 窗口还没到就想看到释放 | `isReleased` 仍是 false；verify 没有 `ThreadReleased` | 等 `CALENDAR_WINDOW`（默认 1800 秒）。演示可先在网页点「演示：标记彻底放下」 |
+| 窗口还没到就想看到释放 | `isReleased` 仍是 false；verify 没有 `ThreadReleased` | 等 `CALENDAR_WINDOW`（录 demo 建议 300 秒）。网页演示可点「⏩ 时间快进」 |
 | 窗口过了仍未释放 | Lasna `subscribedCron` 为 false，或 `debt > 0`，或 `pendingCount` 为 0 | 确认已 pledge；查 Reactive 余额与 debt；给合约转 lREACT 或 `coverDebt()` |
 | 回调 out of gas | 极少：`markReleased` 是暖写入，通常远低于 ~155800 | 仍失败则查 Proxy debt；给日历合约补 Sepolia ETH |
 | Cron 一直空转扣费 | 有待办时才订 Cron；队列空会退订 Cron | 正常。紧急可 `-Stage` 对应的 `StopCalendar` forge 脚本 |

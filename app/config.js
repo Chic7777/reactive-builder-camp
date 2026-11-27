@@ -6,7 +6,7 @@ window.ClarityConfig = {
   rpcUrl: "https://ethereum-sepolia-rpc.publicnode.com",
   explorer: "https://sepolia.etherscan.io",
   calendarAddress: "",
-  demoWindowMinutes: 30,
+  demoWindowMinutes: 5,
   backgrounds: {
     ignored: "ignored.svg",
     rumination: "rumination.svg",
