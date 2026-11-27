@@ -1,0 +1,16 @@
+{
+  "name": "恋爱脑清醒日历",
+  "short_name": "清醒日历",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#FFFDF6",
+  "theme_color": "#F4A247",
+  "icons": [
+    {
+      "src": "./art/app-icon.webp",
+      "sizes": "512x512",
+      "type": "image/webp",
+      "purpose": "any maskable"
+    }
+  ]
+}

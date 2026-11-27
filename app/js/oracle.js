@@ -1,200 +1,169 @@
-// Original copy bank. Not copied from any existing oracle deck.
-// Runtime: local keyword match only. No AI, no network.
-
+// Oracle by REPLY TONE class (not entry keyword). Original copy. No AI / network.
 window.ClarityOracle = (function () {
+  const TONES = ["wakeup", "question", "roast", "gentle", "life"];
+
+  const ART = {
+    wakeup: "oracle-wakeup.webp",
+    question: "oracle-question.webp",
+    roast: "oracle-roast.webp",
+    gentle: "oracle-gentle.webp",
+    life: "oracle-life.webp"
+  };
+
+  const LABELS = {
+    wakeup: { zh: "当头棒喝", en: "Wake-up call" },
+    question: { zh: "反问清醒", en: "Clearing question" },
+    roast: { zh: "毒舌吐槽", en: "Sassy roast" },
+    gentle: { zh: "温柔托底", en: "Gentle hold" },
+    life: { zh: "拉回生活", en: "Back to life" }
+  };
+
   const BANK = {
-    ignored: {
+    wakeup: {
       zh: [
+        "他不是忙，是不想。",
+        "别在垃圾堆里找安全感。",
         "已读不回不是考题，你不必交卷。",
-        "他把聊天挂起，世界没有因此停转。",
-        "冷淡可以是答案，也可以只是他忙。你先把自己暖着。",
-        "等回信的那几分钟，请先喝口水。",
+        "冷淡可以是答案。先把自己暖着。",
+        "你在等人的回信，生活在等你回来。",
+        "把手机翻面。屏幕不会比你更着急。",
+        "清醒的第一秒：他没有你想象中那么在意。",
+        "别把沉默翻译成深情。"
+      ],
+      en: [
+        "He's not busy—he doesn't want to.",
+        "Don't dig for safety in a trash pile.",
+        "Unread is not a test. You don't owe silence an essay.",
+        "Cold can be an answer. Warm yourself first.",
+        "You're waiting on a reply. Life is waiting on you.",
+        "Flip the phone. The screen isn't more urgent than you.",
+        "Clarity second one: he cares less than your mind claims.",
+        "Don't translate silence into devotion."
+      ]
+    },
+    question: {
+      zh: [
+        "是事实如此，还是委屈小剧场又在加戏？",
+        "你想要的是他，还是「被选择」的感觉？",
+        "如果朋友经历同样的事，你会怎么劝？",
+        "这份紧张，有多少来自他，有多少来自旧伤口？",
+        "你是在连接，还是在止痒？",
+        "明天的你会感谢今晚的催促吗？",
+        "不回你的人，配占用你的睡眠吗？",
+        "你愿意为不确定再付多少情绪租金？"
+      ],
+      en: [
+        "Is it true—or is the drama theater improvising again?",
+        "Do you want him, or the feeling of being chosen?",
+        "If a friend lived this, what would you tell her?",
+        "How much of this ache is him—and how much is an old wound?",
+        "Is this connection, or itch-scratching?",
+        "Will tomorrow-you thank tonight's urgency?",
+        "Does someone who won't reply deserve your sleep?",
+        "How much emotional rent will you keep paying for maybe?"
+      ]
+    },
+    roast: {
+      zh: [
+        "别脑补了，他只是无聊，不是爱你。",
+        "回得慢不是在忙，是在想怎么敷衍。",
         "你的价值不由他的回复速度计价。",
-        "静音对方之前，先静音催促自己的那句『快看看』。",
-        "没有回，不代表你写错了。有时只是他没写。",
-        "把手机翻面。屏幕不会比你更着急。"
-      ],
-      en: [
-        "Unread is not a test. You don't owe an answer to silence.",
-        "He paused the chat. The planet kept spinning.",
-        "Cold can mean busy, or mean no. Warm yourself first.",
-        "While you wait, drink water like it's a tiny rebellion.",
-        "Your worth is not priced by his reply speed.",
-        "Mute the urge to refresh before you mute anyone else.",
-        "No reply doesn't mean you wrote it wrong.",
-        "Flip the phone. The screen isn't more urgent than you."
-      ]
-    },
-    rumination: {
-      zh: [
-        "脑内法庭休庭。证据不足，驳回『他是不是不爱我』。",
-        "胡思乱想很勤快，真相通常很懒。",
-        "把『万一』写成购物清单，你会发现它一件也买不到。",
-        "爱不爱不是脑内直播能播清楚的。",
-        "你在排练一千种结局，现实还没开场。",
-        "怀疑很吵，事实很安静。先听安静的。",
-        "同一段聊天重播三遍，不会多出一句台词。",
-        "把问号放下。它不会自己变成句号。"
-      ],
-      en: [
-        "Court adjourned. Insufficient evidence for 'does he love me'.",
-        "Overthinking works overtime. Truth is often lazy.",
-        "Write your what-ifs as a shopping list—you can't buy any of them.",
-        "Love isn't clear from a private brain livestream.",
-        "You're rehearsing endings. Reality hasn't started.",
-        "Doubt is loud. Facts are quiet. Prefer quiet.",
-        "Replaying the chat won't add a new line.",
-        "Put the question mark down. It won't become a period alone."
-      ]
-    },
-    urgeToText: {
-      zh: [
-        "想发的那句，先存草稿箱过夜。",
-        "主动一次可以，连环追问像给焦虑加班。",
-        "手指比心快时，先坐回去。",
-        "你不是客服，不必秒回自己的不安。",
-        "发之前问：这是连接，还是止痒？",
-        "空白气泡也是一种边界。",
-        "把『在吗』换成『我先好好过今晚』。",
-        "想联系时，先联系一下自己的晚饭。"
-      ],
-      en: [
-        "Park that text in drafts overnight.",
-        "One reach-out is fine. A chase is unpaid overtime for anxiety.",
-        "When fingers outrun the heart, sit back down.",
-        "You're not customer support for your own panic.",
-        "Ask first: connection, or itch-scratch?",
-        "An empty bubble can be a boundary.",
-        "Swap 'you there?' for 'I'll have a good night first'.",
-        "Before you text him, text your dinner plans to yourself."
-      ]
-    },
-    jealousy: {
-      zh: [
         "比较是偷走今天的小偷。",
-        "她的故事不是你的成绩单。",
-        "嫉妒来访时，请它坐一下，别让它开车。",
-        "别人被看见，不减少你被爱的配额。",
         "屏幕里的甜蜜常常是精修。",
-        "把『凭什么』改成『我还缺什么对自己好』。",
-        "吃醋可以承认，不必变成行动号召。",
-        "你的生活不是他的社交动态附庸。"
+        "同一个人连发三次「在吗」，焦虑会给你加班费吗？",
+        "他把聊天挂起，地球照转。",
+        "你不是客服，不必秒回自己的不安。"
       ],
       en: [
+        "Stop the fanfic—he's bored, not in love.",
+        "Slow replies aren't busy; they're drafting brush-offs.",
+        "Your worth isn't priced by his reply speed.",
         "Comparison is a pickpocket for today.",
-        "Her story isn't your report card.",
-        "When jealousy visits, offer a chair—don't hand it the keys.",
-        "Someone else being seen doesn't shrink your love quota.",
         "Feed-perfect romance is often retouched.",
-        "Trade 'why them' for 'what kindness do I owe myself'.",
-        "Admit the envy. Don't elect it as campaign manager.",
-        "Your life is not a footnote to his feed."
+        "Three 'you there?' texts don't pay anxiety overtime.",
+        "He paused the chat. The planet kept spinning.",
+        "You're not customer support for your own panic."
       ]
     },
-    reunion: {
+    gentle: {
       zh: [
-        "复合是选项，不是默认按钮。",
-        "回去之前，先数清离开时放下的那些疼。",
-        "旧消息翻出来，不会变成新答案。",
-        "想复合时，先复合一下和自己的作息。",
-        "同一扇门敲第三次，门很少变得更温柔。",
-        "怀念的是温度，还是熟悉的伤？",
-        "『再试一次』需要新条件，不是旧惯性。",
-        "把复合愿望写成：我愿先把今天过完。"
+        "你已经很努力了，先喝口水吧。",
+        "敏感不是缺陷，是雷达。学会调音量。",
+        "允许混乱，也允许明天更轻一点。",
+        "你配被好好对待，从对自己开始。",
+        "眼泪可以有，拥抱也可以有。",
+        "把骂自己的话，换成你会跟朋友说的话。",
+        "慢慢来，清醒是温柔的事。",
+        "今晚先把自己安顿好，明天的太阳会等你。"
       ],
       en: [
-        "Getting back together is an option, not a default button.",
-        "Before you return, count what leaving already taught you.",
-        "Old threads don't mint new answers.",
-        "Miss him? First reunite with your sleep schedule.",
-        "Knocking the same door rarely makes it kinder.",
-        "Are you missing warmth—or a familiar bruise?",
-        "'One more try' needs new terms, not old inertia.",
-        "Rewrite the wish as: I will finish living today first."
-      ]
-    },
-    selfDoubt: {
-      zh: [
-        "你不需要更懂事，才配被好好对待。",
-        "自我怀疑很会化妆，打扮成『理性』。",
-        "不够好？证据请出示，传闻无效。",
-        "你的敏感不是缺陷，是雷达。学会调音量。",
-        "把骂自己的话，换成你会对朋友说的话。",
-        "被冷落不等于你多余。",
-        "你已经在学着放下，这本身就很清醒。",
-        "好好生活不是奖赏，是你本来就可以。"
-      ],
-      en: [
-        "You don't need to be easier to deserve care.",
-        "Self-doubt wears a costume labeled 'rational'.",
-        "Not enough? Show evidence. Rumors don't count.",
-        "Sensitivity is radar. Learn the volume knob.",
-        "Replace the insult you'd never say to a friend.",
-        "Being overlooked doesn't make you extra.",
-        "You're already practicing letting go. That's clarity.",
-        "Living well isn't a prize. It's allowed."
-      ]
-    },
-    fallback: {
-      zh: [
-        "今天这一格，先写下来，再决定要不要放。",
-        "恋爱脑来访不可耻，留宿太久才贵。",
-        "你有权混乱，也有权第二天更轻一点。",
-        "把情绪放进日历，比放进他的对话框安全。",
-        "毒舌一点：戏剧很贵，平静打折。",
-        "先呼吸。格子不会跑。",
-        "你在见证自己，不是在审判自己。",
-        "继续好好生活——这句可以重复盖章。"
-      ],
-      en: [
-        "Write the square first. Decide release later.",
-        "Love-brain visits aren't shameful. Long stays are expensive.",
+        "You've tried hard enough. Drink water.",
+        "Sensitivity is radar—learn the volume knob.",
         "You're allowed to spiral—and to be lighter tomorrow.",
-        "A calendar is safer storage than his chat thread.",
-        "Sassy truth: drama is pricey; calm is on sale.",
-        "Breathe. The cell isn't going anywhere.",
-        "You're witnessing yourself, not prosecuting yourself.",
+        "You deserve care. Start with yourself.",
+        "Tears are allowed. So are hugs.",
+        "Replace the insult you'd never say to a friend.",
+        "Go slow. Clarity can be gentle.",
+        "Settle yourself tonight. Morning will wait."
+      ]
+    },
+    life: {
+      zh: [
+        "先联系一下自己的晚饭。",
+        "把「再试一次」换成「先把今天过完」。",
+        "出去走走，风比对话框诚实。",
+        "整理一下桌面，也是在整理心。",
+        "给自己定一个小小的、立刻能做的好事。",
+        "睡觉、洗澡、拉伸——比刷新聊天有用。",
+        "把能量花在会回应你的人与事上。",
+        "继续好好生活——这句可以盖章重复。"
+      ],
+      en: [
+        "Text your dinner plans to yourself first.",
+        "Swap 'one more try' for 'finish living today'.",
+        "Take a walk. Wind is more honest than chat.",
+        "Tidy the desk—you're tidying the mind too.",
+        "Do one tiny kindness you can finish now.",
+        "Sleep, shower, stretch—better than refreshing chat.",
+        "Spend energy on what answers you back.",
         "Keep living well—stamp that line again."
       ]
     }
   };
 
-  const RULES = [
-    { cat: "ignored", keys: ["已读不回", "不回我", "已读", "冷淡", "无视", "seen", "left on read", "ignoring", "cold"] },
-    { cat: "rumination", keys: ["胡思乱想", "他爱不爱", "是不是不爱", "会不会不爱", "想多了", "overthink", "does he love", "ruminat"] },
-    { cat: "urgeToText", keys: ["想发消息", "想联系", "想找他", "要不要发", "主动", "text him", "message him", "reach out", "should i text"] },
-    { cat: "jealousy", keys: ["嫉妒", "吃醋", "比较", "她有", "别人", "jealous", "envy", "compare"] },
-    { cat: "reunion", keys: ["复合", "挽回", "再试试", "回到", "ex", "get back", "reunion", "win him"] },
-    { cat: "selfDoubt", keys: ["我是不是", "我不够", "嫌弃", "自我", "讨厌自己", "not enough", "insecure", "self doubt", "worthless"] }
-  ];
+  const STICKERS = ["🌱", "☁️", "🍓", "🌻", "🩹", "🍵", "⭐", "🌙", "🍬", "🌷", "🫧", "💊"];
 
-  function detectCategory(text) {
-    const t = String(text || "").toLowerCase();
-    for (const rule of RULES) {
-      for (const k of rule.keys) {
-        if (t.includes(k.toLowerCase())) return rule.cat;
-      }
-    }
-    return "fallback";
+  function pickTone(seed) {
+    const i = Math.abs(Number(seed) || Date.now()) % TONES.length;
+    return TONES[i];
   }
 
-  function pickLine(category, lang, seed) {
-    const pack = BANK[category] || BANK.fallback;
-    const lines = pack[lang] || pack.zh;
-    const i = Math.abs(Number(seed) || Date.now()) % lines.length;
-    return { category, line: lines[i], index: i };
+  function pickLine(tone, lang, seed) {
+    const pack = BANK[tone] || BANK.roast;
+    const lines = pack[lang === "en" ? "en" : "zh"];
+    const i = Math.abs(Number(seed) || 1) % lines.length;
+    return { tone: tone, line: lines[i], index: i, label: LABELS[tone], art: ART[tone] };
   }
 
-  function speak(text, lang) {
-    return pickLine(detectCategory(text), lang === "en" ? "en" : "zh", hash(text));
+  function reveal(seed) {
+    const tone = pickTone(seed);
+    const zh = pickLine(tone, "zh", seed);
+    const en = pickLine(tone, "en", seed + 17);
+    return {
+      tone: tone,
+      art: ART[tone],
+      labelZh: LABELS[tone].zh,
+      labelEn: LABELS[tone].en,
+      oracleZh: zh.line,
+      oracleEn: en.line
+    };
   }
 
-  function hash(s) {
-    let h = 0;
-    const str = String(s || "");
-    for (let i = 0; i < str.length; i++) h = (h * 31 + str.charCodeAt(i)) | 0;
-    return h;
+  function stickerFor(dayKey, tone) {
+    const n = String(dayKey || "").split("").reduce(function (s, c) { return s + c.charCodeAt(0); }, 0);
+    const idx = Math.abs(n + (TONES.indexOf(tone) + 1) * 3) % STICKERS.length;
+    return STICKERS[idx];
   }
 
-  return { BANK, detectCategory, pickLine, speak };
+  return { TONES, ART, LABELS, BANK, reveal, pickLine, stickerFor };
 })();

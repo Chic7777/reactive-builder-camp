@@ -3,72 +3,203 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#fff7f9">
+  <meta name="theme-color" content="#F4A247">
   <title>恋爱脑清醒日历 / Love-Brain Clarity Calendar</title>
-  <meta name="description" content="一张软软的月历，安静见证你把恋爱脑念头放下。">
+  <meta name="description" content="今天，也在好好爱自己。">
+  <link rel="icon" href="./art/app-icon.webp">
+  <link rel="apple-touch-icon" href="./art/app-icon.webp">
+  <link rel="manifest" href="./manifest.webmanifest">
   <link rel="stylesheet" href="./css/calendar.css">
 </head>
 <body>
-  <div class="phone" id="phoneShell">
-    <header class="topbar">
-      <div class="topbar-left">
-        <span class="badge demo-badge" id="demoBadge" hidden>演示中</span>
+  <!-- 1 Opening -->
+  <section id="opening" class="opening" hidden>
+    <button type="button" class="skip-btn" id="btnSkip">Skip / 跳过</button>
+    <div class="opening-inner">
+      <h1 class="opening-title">
+        今天，也在<span class="flash">好好爱自己</span>
+      </h1>
+      <p class="opening-sub" id="openingSub">— Love yourself today —</p>
+      <div class="tea-wrap">
+        <img src="./art/tea-person.webp" alt="" class="tea-person" id="teaPerson">
+        <span class="steam" aria-hidden="true"></span>
+        <span class="steam steam2" aria-hidden="true"></span>
       </div>
-      <div class="topbar-right" role="navigation" aria-label="Language">
-        <button type="button" class="lang-btn" id="langZh" aria-pressed="true">中文</button>
-        <button type="button" class="lang-btn" id="langEn" aria-pressed="false">EN</button>
+      <p class="opening-hint" id="openingHint">轻轻触碰，翻开属于你的清醒手账 ✦</p>
+    </div>
+  </section>
+
+  <!-- App shell -->
+  <div class="phone" id="appShell" hidden>
+    <header class="topbar">
+      <img class="app-icon" src="./art/app-icon.webp" alt="恋爱脑清醒日历" width="36" height="36">
+      <div class="topbar-right">
+        <button type="button" class="icon-pill" id="btnWallet" aria-label="Wallet">👛</button>
+        <button type="button" class="icon-pill" id="btnLang" aria-label="Language">🌐 中/EN</button>
       </div>
     </header>
 
-    <section class="hero">
-      <h1 class="brand" id="brand">恋爱脑清醒日历<span>Love-Brain Clarity Calendar</span></h1>
-      <p class="lead" id="lead">一张软软的月历，安静见证你把恋爱脑念头放下。</p>
-      <p class="living-well" id="livingWell">恭喜你，依旧在好好生活</p>
-      <div class="hero-actions">
-        <button type="button" class="primary" id="btnDemo">进入演示模式</button>
-        <button type="button" class="ghost" id="btnSeed">填入示例数据</button>
-        <button type="button" class="ghost" id="btnConnect">连接 MetaMask</button>
-      </div>
-    </section>
+    <div class="pager" id="pager">
+      <!-- 2 Home -->
+      <section class="page page-home" id="pageHome" data-page="0">
+        <div class="home-hero" id="homeHero">
+          <div class="home-meta">
+            <span class="chip soft" id="timeChip">清晨暖阳</span>
+            <span class="chip soft" id="weatherChip">好好生活</span>
+          </div>
+          <h2 class="home-date" id="homeDate">—</h2>
+          <p class="home-dow" id="homeDow">—</p>
+          <p class="home-clock" id="homeClock">—</p>
+          <p class="home-kaomoji" id="homeKaomoji">今天也要对自己超级心软呀 (｡♥‿♥｡)</p>
+        </div>
 
-    <main class="shell">
-      <div class="month-head">
-        <button type="button" class="ghost icon-btn" id="prevMonth" aria-label="Previous month">←</button>
-        <h2 id="monthTitle">Month</h2>
-        <button type="button" class="ghost icon-btn" id="nextMonth" aria-label="Next month">→</button>
-      </div>
-      <div class="weekdays" id="weekdays" aria-hidden="true"></div>
-      <div class="grid" id="grid" role="grid" aria-label="Calendar"></div>
-      <div class="demo-tools">
-        <button type="button" class="fast-fwd" id="btnFastForward" hidden>⏩ 时间快进</button>
-      </div>
-    </main>
+        <article class="card tape-card">
+          <div class="tape tape-orange" aria-hidden="true"></div>
+          <div class="bless-heart">♡</div>
+          <p class="bless-text" id="blessText">—</p>
+          <p class="bless-foot" id="blessFoot">今日清醒猫点 · Heartbeat soft</p>
+        </article>
+
+        <article class="card tape-card">
+          <div class="tape tape-coral" aria-hidden="true"></div>
+          <h3 class="card-title" id="trashTitle">情绪碎碎念垃圾桶</h3>
+          <p class="card-note" id="trashNote">把心里的小波浪丢进来，轻一点继续走。</p>
+          <button type="button" class="btn-primary" id="btnStartWrite">写下今天的「恋爱脑」小泡泡</button>
+          <div class="demo-row">
+            <button type="button" class="btn-ghost" id="btnSeed">填入示例数据</button>
+            <button type="button" class="fast-fwd" id="btnFastForward" hidden>⏩ 时间快进</button>
+          </div>
+          <span class="badge demo-badge" id="demoBadge" hidden>演示中</span>
+        </article>
+
+        <article class="card tape-card" id="homeOracleCard" hidden>
+          <div class="tape tape-blue" aria-hidden="true"></div>
+          <h3 class="card-title" id="homeOracleTitle">毒舌神谕 · 恋爱脑粉碎机</h3>
+          <div class="oracle-mini" id="homeOracleMini">
+            <p class="oracle-mini-label" id="homeOracleLabel"></p>
+            <p class="oracle-mini-line" id="homeOracleLine"></p>
+          </div>
+          <button type="button" class="btn-ghost" id="btnOpenOracle">戳戳看大卡 ✨</button>
+        </article>
+      </section>
+
+      <!-- 6 Calendar -->
+      <section class="page page-cal" id="pageCalendar" data-page="1">
+        <article class="card tape-card cal-head-card">
+          <div class="tape tape-orange" aria-hidden="true"></div>
+          <div class="month-head">
+            <button type="button" class="nav-round" id="prevMonth" aria-label="Prev">‹</button>
+            <div class="month-title-wrap">
+              <h2 id="monthTitle">—</h2>
+              <p class="month-sub" id="monthSub">情绪漫游手账本</p>
+            </div>
+            <button type="button" class="nav-round" id="nextMonth" aria-label="Next">›</button>
+            <button type="button" class="btn-today" id="btnToday">回到今天</button>
+          </div>
+        </article>
+
+        <div class="cal-flip-stage" id="calFlipStage">
+          <article class="card cal-grid-card" id="calCard">
+            <div class="weekdays" id="weekdays"></div>
+            <div class="cal-matrix">
+              <svg class="thread-svg" id="threadSvg" aria-hidden="true"></svg>
+              <div class="grid" id="grid" role="grid"></div>
+            </div>
+          </article>
+        </div>
+
+        <article class="card tape-card" id="dayDetail" hidden>
+          <div class="tape tape-coral" aria-hidden="true"></div>
+          <div class="detail-top">
+            <h3 id="detailTitle">—</h3>
+          </div>
+          <p class="detail-meta" id="detailMeta"></p>
+          <button type="button" class="btn-secondary" id="btnPledgeFromCal">🌷 愿意放下</button>
+          <blockquote class="detail-text" id="detailText"></blockquote>
+          <div class="oracle-stub" id="detailOracle" hidden>
+            <p class="oracle-stub-label" id="detailOracleLabel">🔖 毒舌清醒糖纸</p>
+            <p class="oracle-stub-line" id="detailOracleLine"></p>
+            <button type="button" class="btn-ghost" id="btnDetailOracle">戳戳看大卡 ✨</button>
+          </div>
+        </article>
+      </section>
+    </div>
+
+    <nav class="dots" aria-label="Pages">
+      <button type="button" class="dot active" data-dot="0" aria-label="Home"></button>
+      <button type="button" class="dot" data-dot="1" aria-label="Calendar"></button>
+    </nav>
+    <button type="button" class="swipe-hint" id="swipeHint">右滑翻开手账小日历呀 →</button>
   </div>
 
-  <div class="sheet-backdrop" id="sheetBackdrop" hidden></div>
-  <section class="sheet" id="panel" aria-live="polite" hidden>
-    <div class="sheet-handle" aria-hidden="true"></div>
-    <div class="panel-bg" id="panelBg"></div>
-    <div class="panel-body">
+  <!-- 3 Related step -->
+  <div class="sheet-backdrop" id="linkBackdrop" hidden></div>
+  <section class="sheet" id="sheetLink" hidden>
+    <div class="sheet-handle"></div>
+    <div class="sheet-bow" aria-hidden="true">🎀</div>
+    <div class="sheet-body">
       <div class="sheet-top">
-        <h3 id="panelTitle">写下今天</h3>
-        <button type="button" class="ghost icon-btn" id="btnCloseSheet" aria-label="Close">✕</button>
+        <h3 id="linkStepTitle">🧸 情绪脉络梳理 · 第 1/2 步</h3>
+        <button type="button" class="close-x" id="btnCloseLink" aria-label="Close">✕</button>
       </div>
-      <div id="linkBox" class="link-box"></div>
-      <textarea id="entryText" maxlength="2000" aria-label="日记" placeholder="例如：他今天没理我，他是不是不爱我"></textarea>
-      <p class="note" id="oracleLabel">毒舌神谕</p>
-      <p class="oracle" id="oracle"></p>
-      <div class="stack">
-        <button type="button" class="primary" id="btnSave">保存</button>
-        <button type="button" class="danger-soft" id="btnPledge">我愿意彻底放下，继续好好生活</button>
+      <h2 class="sheet-q" id="linkQuestion">这次和之前的事有关吗？💭</h2>
+      <p class="sheet-sub" id="linkSub">轻轻选一选，我们帮你把心结串成线 (・ω・)ノ</p>
+      <div class="choice-row">
+        <button type="button" class="choice" id="choiceFresh" data-mode="fresh">
+          <span class="choice-ico">🌱</span>
+          <strong id="choiceFreshTitle">全新一件事 ✨</strong>
+          <span id="choiceFreshSub">开一团新的念头</span>
+        </button>
+        <button type="button" class="choice selected" id="choiceRelated" data-mode="related">
+          <span class="choice-ico">🔗</span>
+          <strong id="choiceRelatedTitle">和旧心结有关 🫧</strong>
+          <span id="choiceRelatedSub">关联之前的日子</span>
+        </button>
+      </div>
+      <div id="priorStickers" class="prior-grid" hidden></div>
+      <button type="button" class="btn-primary" id="btnLinkContinue">✏️ 继续写下细节 →</button>
+      <button type="button" class="text-link" id="btnLinkLater">稍后再记 · 先去抱抱自己 🧸</button>
+    </div>
+  </section>
+
+  <!-- 4 Write sheet -->
+  <div class="sheet-backdrop" id="writeBackdrop" hidden></div>
+  <section class="sheet tall" id="sheetWrite" hidden>
+    <div class="sheet-handle"></div>
+    <div class="sheet-body">
+      <div class="sheet-top">
+        <h3 id="writeTitle">坦诚写下这一刻的想法</h3>
+        <button type="button" class="close-x" id="btnCloseWrite" aria-label="Close">✕</button>
+      </div>
+      <p class="sheet-sub" id="writeSub">这里没有批判，只有接纳与清醒</p>
+      <div class="prompt-box" id="writePrompt">揉揉脑袋：是事实如此，还是委屈小剧场又在偷偷加戏啦？</div>
+      <textarea id="entryText" maxlength="500" placeholder="把心里的小泡泡写下来…"></textarea>
+      <div class="char-count"><span id="charCount">0</span> / 500</div>
+      <p class="mood-label" id="moodLabel">为此刻的心情贴上小标签 · 可多选</p>
+      <div class="mood-chips" id="moodChips"></div>
+      <div class="btn-row">
+        <button type="button" class="btn-secondary" id="btnSaveOnly">先存起来 (慢慢想)</button>
+        <button type="button" class="btn-primary" id="btnPledge">我愿意放下啦</button>
       </div>
     </div>
   </section>
 
-  <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+  <!-- 5 Oracle reveal -->
+  <section class="oracle-reveal" id="oracleReveal" hidden>
+    <div class="oracle-tag" id="oracleTag">✦ 醒脑时刻</div>
+    <div class="oracle-card" id="oracleCard">
+      <p class="oracle-card-label" id="oracleCardLabel"></p>
+      <p class="oracle-card-line" id="oracleCardLine"></p>
+    </div>
+    <button type="button" class="btn-primary" id="btnTuckOracle">我清醒了 · 收进月历手账</button>
+    <p class="oracle-dismiss" id="oracleDismiss">轻触任意处收起并返回</p>
+  </section>
+
+  <div class="toast" id="toast" hidden role="status"></div>
 
   <script src="https://cdn.jsdelivr.net/npm/ethers@6.13.4/dist/ethers.umd.min.js" onerror="window.__ethersFailed=true"></script>
   <script src="./config.js"></script>
+  <script src="./js/blessings.js"></script>
   <script src="./js/oracle.js"></script>
   <script src="./js/storage.js"></script>
   <script src="./js/graph.js"></script>
