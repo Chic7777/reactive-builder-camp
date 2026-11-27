@@ -1,0 +1,102 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"><meta content="mobile_stack" name="shell-type"><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"><link href="https://fonts.googleapis.com" rel="preconnect"><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"><link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;700;800&amp;family=Karla:ital,wght@0,400;0,600;0,700;1,400&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"><style>@layer base{html,body{width:100vw;margin:0;padding:0;overflow-x:hidden;}body{overscroll-behavior:none;background-color:#091e33;}.pb-safe{padding-bottom:env(safe-area-inset-bottom,0px);}.pt-safe{padding-top:env(safe-area-inset-top,0px);}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { colors: { "on-primary": "#ffffff", "surface": "#f8f9ff", "on-secondary": "#ffffff", "tertiary-fixed": "#d4e3ff", "primary": "#8a5100", "primary-fixed": "#ffdcbd", "on-primary-container": "#683b00", "inverse-on-surface": "#eaf1ff", "secondary-fixed-dim": "#ffb4a9", "on-tertiary-container": "#064681", "primary-fixed-dim": "#ffb86f", "surface-variant": "#d3e4ff", "on-tertiary": "#ffffff", "on-primary-fixed-variant": "#693c00", "inverse-surface": "#093158", "on-background": "#001c38", "surface-tint": "#8a5100", "on-tertiary-fixed": "#001c3a", "surface-bright": "#f8f9ff", "surface-container-highest": "#d3e4ff", "on-surface": "#001c38", "error": "#ba1a1a", "secondary-fixed": "#ffdad5", "tertiary-fixed-dim": "#a5c8ff", "inverse-primary": "#ffb86f", "surface-dim": "#c5dcff", "on-secondary-container": "#6f0905", "error-container": "#ffdad6", "surface-container-low": "#eff4ff", "on-tertiary-fixed-variant": "#084783", "secondary-container": "#fd7361", "secondary": "#a9362a", "surface-container": "#e6eeff", "surface-container-high": "#dde9ff", "tertiary-container": "#88b6f8", "surface-container-lowest": "#ffffff", "background": "#f8f9ff", "outline": "#857465", "primary-container": "#f4a247", "on-error-container": "#93000a", "on-error": "#ffffff", "on-primary-fixed": "#2c1600", "on-surface-variant": "#534437", "tertiary": "#2d609c", "on-secondary-fixed-variant": "#881e15", "on-secondary-fixed": "#410000", "outline-variant": "#d8c3b1" }, borderRadius: { "DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px" }, spacing: { "space-xl": "2.25rem", "margin-mobile": "1.25rem", "gutter": "1rem", "margin": "1.5rem", "space-sm": "0.5rem", "space-md": "1rem", "space-lg": "1.5rem", "gutter-mobile": "0.75rem", "space-xs": "0.25rem" }, fontFamily: { "title-md": ["Bricolage Grotesque"], "body-sm": ["Karla"], "display-lg": ["Bricolage Grotesque"], "headline-lg-mobile": ["Bricolage Grotesque"], "display-lg-mobile": ["Bricolage Grotesque"], "label-sm": ["Karla"], "label-md": ["Karla"], "label-lg": ["Karla"], "body-md": ["Karla"], "body-lg": ["Karla"], "headline-md": ["Bricolage Grotesque"], "headline-lg": ["Bricolage Grotesque"] }, fontSize: { "title-md": ["18px", { "lineHeight": "24px", "fontWeight": "600" }], "body-sm": ["13px", { "lineHeight": "18px", "fontWeight": "400" }], "display-lg": ["40px", { "lineHeight": "48px", "letterSpacing": "-0.02em", "fontWeight": "800" }], "headline-lg-mobile": ["24px", { "lineHeight": "30px", "letterSpacing": "0", "fontWeight": "700" }], "display-lg-mobile": ["32px", { "lineHeight": "38px", "letterSpacing": "-0.01em", "fontWeight": "800" }], "label-sm": ["11px", { "lineHeight": "14px", "letterSpacing": "0.05em", "fontWeight": "700" }], "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.04em", "fontWeight": "700" }], "label-lg": ["14px", { "lineHeight": "18px", "letterSpacing": "0.02em", "fontWeight": "700" }], "body-md": ["15px", { "lineHeight": "22px", "fontWeight": "400" }], "body-lg": ["17px", { "lineHeight": "26px", "fontWeight": "400" }], "headline-md": ["22px", { "lineHeight": "28px", "fontWeight": "600" }], "headline-lg": ["30px", { "lineHeight": "36px", "letterSpacing": "-0.01em", "fontWeight": "700" }] } } } }</script></head><body class="font-body-md text-body-md text-on-surface flex flex-col min-h-screen relative overflow-hidden select-none">
+<!-- Blurred Underlay: Simulating Page 4 "Writing Record" Behind Modal -->
+<div class="fixed inset-0 pointer-events-none z-0 filter blur-md opacity-40 scale-105 bg-[#fbf9f4] flex flex-col p-6">
+<div class="h-6 w-36 bg-[#e2dacb] rounded-full mb-8"></div>
+<div class="bg-white rounded-3xl p-6 shadow-sm border border-[#e8dfcf] space-y-4">
+<div class="h-4 bg-[#f0e7d8] rounded w-2/3"></div>
+<div class="h-4 bg-[#f0e7d8] rounded w-full"></div>
+<div class="h-20 bg-[#faf6ef] rounded-2xl border border-dashed border-[#dfd5c3]"></div>
+</div>
+<div class="mt-auto h-12 w-full bg-[#f4a247]/50 rounded-full"></div>
+</div>
+<!-- Modal Dim Overlay & Journal Tint -->
+<div class="fixed inset-0 z-10 bg-slate-900/60 backdrop-blur-md transition-opacity"></div>
+<!-- Toast Affirmation Notification -->
+<div class="fixed top-6 left-1/2 -translate-x-1/2 z-50 bg-surface-container-lowest/95 backdrop-blur shadow-xl px-space-md py-space-xs rounded-full flex items-center gap-space-xs transition-all duration-300 opacity-0 pointer-events-none transform -translate-y-2 border border-outline-variant/30" id="toast-affirmation">
+<span class="material-symbols-outlined text-secondary text-[18px]">verified</span>
+<span class="font-label-md text-label-md text-tertiary">已收纳进你的疗愈月历手账</span>
+</div>
+<!-- Modal Dialog / Paper Ritual Container -->
+<main class="relative z-20 flex-1 flex flex-col justify-between items-center w-full max-w-[440px] mx-auto min-h-screen pt-safe pb-safe px-margin-mobile">
+<!-- Top Ribbon & Close Interaction -->
+<header class="w-full flex items-center justify-between pt-3 pb-2 z-30">
+<div class="flex items-center">
+<!-- Paper Tape Tag -->
+<div class="relative px-3.5 py-1 bg-amber-50/90 text-primary border border-amber-200/80 rounded-sm shadow-sm flex items-center gap-1.5 -rotate-1 backdrop-blur-sm">
+<span class="material-symbols-outlined text-secondary text-[14px]">auto_awesome</span>
+<span class="font-label-sm text-[12px] font-bold tracking-wider">醒脑时刻</span>
+<!-- Decorative tape edges -->
+<span class="absolute -left-1.5 top-1/2 -translate-y-1/2 w-1.5 h-3 border-l-2 border-dashed border-amber-300/80"></span>
+<span class="absolute -right-1.5 top-1/2 -translate-y-1/2 w-1.5 h-3 border-r-2 border-dashed border-amber-300/80"></span>
+</div>
+</div>
+<!-- Soft Dismiss Button (X) -->
+
+</header>
+<!-- Oracle Card Body (Pure Hand-drawn Art Card) -->
+<div class="w-full flex-1 flex flex-col items-center justify-center my-auto py-2">
+<!-- Card Spread Container with slight tilt & rough-deckle paper drop shadow -->
+<div class="relative w-full max-w-[340px] aspect-[9/16] max-h-[570px] rounded-2xl overflow-hidden shadow-[0_20px_40px_-10px_rgba(0,0,0,0.5),0_2px_10px_rgba(0,0,0,0.2)] transition-transform duration-300 hover:rotate-0 rotate-[-0.6deg]">
+<!-- User Uploaded Hand-drawn Card Background (https://lh3.googleusercontent.com/aida-public/AB6AXuDuBSrH7tq9WbGbfQa2scbVPzMrZe5q8HSbeXRRQKbJ5I8Abxuyj1XgHUqyUESNpjlPolUQ3kBbEs307D_AfCqs4Qv04-QKwOXSTjlKmXQo60DpXntGjvb2FQmLjtuE1c6-Qi6qJPdejZX3y1cyPtdPSznX_2NCYYuYAwY_U-RGcEtjEcIi6KIdult5tcQH0TAM-zOg99SFqEzBG3KcWdnJQKUEudms3aNay4z_PNIAy3O4oqSLwgXn) -->
+<img alt="醒脑神谕卡" class="absolute inset-0 w-full h-full object-cover pointer-events-none select-none z-0" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDuBSrH7tq9WbGbfQa2scbVPzMrZe5q8HSbeXRRQKbJ5I8Abxuyj1XgHUqyUESNpjlPolUQ3kBbEs307D_AfCqs4Qv04-QKwOXSTjlKmXQo60DpXntGjvb2FQmLjtuE1c6-Qi6qJPdejZX3y1cyPtdPSznX_2NCYYuYAwY_U-RGcEtjEcIi6KIdult5tcQH0TAM-zOg99SFqEzBG3KcWdnJQKUEudms3aNay4z_PNIAy3O4oqSLwgXn">
+<!-- Text Content Layer (Hand-crafted layout right over the central art burst) -->
+<div class="relative z-10 w-full h-full flex flex-col justify-between p-5 select-none">
+<!-- Subtle Top Minimal Indicator inside Card -->
+
+<!-- Piercing Oracle Punchline (Centering over the burst art) -->
+<div class="flex flex-col items-center justify-center my-auto px-2 text-center">
+<h2 class="font-display-lg text-[29px] leading-[40px] text-[#2d609c] font-black tracking-tight drop-shadow-[0_1px_1px_rgba(255,255,255,0.8)]">
+            他不是忙，<br>
+<span class="text-[#a9362a] text-[33px]">是不想。</span>
+</h2>
+<p class="mt-2.5 font-body-sm text-[12px] text-[#534437]/75 font-semibold tracking-wider bg-white/70 backdrop-blur-sm px-3 py-1 rounded-full shadow-xs">
+            别在垃圾堆里找安全感
+          </p>
+</div>
+<!-- Bottom Gentle Whisper inside Card -->
+
+</div>
+</div>
+</div>
+<!-- Bottom Journal-style Lightweight Action & Closure -->
+<footer class="w-full flex flex-col items-center gap-2 pb-5 pt-1 z-30">
+<button class="w-full max-w-[340px] h-12 bg-primary-container text-on-primary-fixed hover:bg-primary-fixed active:scale-[0.98] transition-all rounded-full font-label-lg text-label-lg flex items-center justify-center gap-2 shadow-lg shadow-black/20 border border-amber-300/40" id="btn-collect">
+<span class="material-symbols-outlined text-[20px]">book_online</span>
+<span>我清醒了 · 收进月历手账</span>
+</button>
+<button class="text-white/60 hover:text-white text-[12px] font-label-sm tracking-wide pt-1 transition-colors" onclick="window.history.back()">
+      轻触任意处收起并返回
+    </button>
+</footer>
+</main>
+<script>
+  (function() {
+    const btnCollect = document.getElementById('btn-collect');
+    const toast = document.getElementById('toast-affirmation');
+
+    function triggerToast(message, callback) {
+      if (!toast) return;
+      toast.querySelector('span:last-child').textContent = message;
+      toast.classList.remove('opacity-0', '-translate-y-2', 'pointer-events-none');
+      toast.classList.add('opacity-100', 'translate-y-0');
+
+      setTimeout(() => {
+        toast.classList.remove('opacity-100', 'translate-y-0');
+        toast.classList.add('opacity-0', '-translate-y-2', 'pointer-events-none');
+        if (callback) callback();
+      }, 1200);
+    }
+
+    if (btnCollect) {
+      btnCollect.addEventListener('click', function() {
+        triggerToast('✨ 心结已解开，记录已入账', () => {
+          window.history.back();
+        });
+      });
+    }
+  })();
+</script>
+
+
+</body></html>

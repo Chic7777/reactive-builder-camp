@@ -1,0 +1,191 @@
+<!DOCTYPE html><html lang="zh-CN"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport">
+<title>开场动画 - 温暖手账</title>
+<!-- Tailwind CSS CDN -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Google Fonts: Noto Serif SC & Caveat / Zen Maru Gothic for warm handwritten feel -->
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600&amp;family=Noto+Serif+SC:wght@300;400;500&amp;family=Zen+Maru+Gothic:wght@400;500;700&amp;display=swap" rel="stylesheet">
+<script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            paper: '#FBF8F1',
+            ink: '#433E3B',
+            mutedInk: '#7D7671',
+            accentBlue: '#4B739B',
+            warmBlush: '#F3D2C4'
+          },
+          fontFamily: {
+            serif: ['"Noto Serif SC"', 'serif'],
+            hand: ['Caveat', 'cursive'],
+            gothic: ['"Zen Maru Gothic"', 'sans-serif']
+          }
+        }
+      }
+    }
+  </script>
+<!-- BEGIN: Custom Texture & Animation Styles -->
+<style data-purpose="paper-texture">
+    /* Subtle grainy paper background texture using SVG filter overlay */
+    .paper-background {
+      background-color: #FAF6EE;
+      background-image: radial-gradient(#E8DFC8 0.6px, transparent 0.6px);
+      background-size: 14px 14px;
+    }
+    
+    /* Subtle warm vignette for cozy book feel */
+    .vignette-overlay {
+      background: radial-gradient(circle at 50% 45%, rgba(255, 255, 255, 0.6) 0%, rgba(243, 235, 222, 0.4) 70%, rgba(228, 217, 201, 0.7) 100%);
+    }
+  </style>
+<style data-purpose="animations">
+    /* Gentle breathing of the cute mascot */
+    @keyframes gentleFloat {
+      0%, 100% {
+        transform: translateY(0px) scale(1);
+      }
+      50% {
+        transform: translateY(-5px) scale(1.012);
+      }
+    }
+
+    /* Subtle steam drift animation */
+    @keyframes riseSteam {
+      0% {
+        opacity: 0.2;
+        transform: translateY(2px) scaleX(0.95);
+      }
+      50% {
+        opacity: 0.85;
+        transform: translateY(-4px) scaleX(1.05);
+      }
+      100% {
+        opacity: 0.2;
+        transform: translateY(-10px) scaleX(0.9);
+      }
+    }
+
+    /* Soft pulse for interactive hint text */
+    @keyframes textGlow {
+      0%, 100% {
+        opacity: 0.65;
+        transform: translateY(0);
+      }
+      50% {
+        opacity: 0.95;
+        transform: translateY(-1.5px);
+      }
+    }
+
+    .animate-float {
+      animation: gentleFloat 5s ease-in-out infinite;
+    }
+
+    .animate-steam {
+      animation: riseSteam 3.2s ease-in-out infinite;
+    }
+
+    .animate-hint {
+      animation: textGlow 2.8s ease-in-out infinite;
+    }
+
+    /* Organic hand-drawn dashed/wobbly style */
+    .sketchy-border {
+      border-radius: 999px;
+      border: 1.5px solid #4B739B;
+      box-shadow: 0 1px 2px rgba(75, 115, 155, 0.12);
+    }
+  </style>
+<!-- END: Custom Texture & Animation Styles -->
+</head>
+<body class="bg-[#ECE5D8] flex items-center justify-center min-h-screen p-0 m-0 font-gothic antialiased selection:bg-[#EBDBC9] select-none">
+<!-- BEGIN: Phone Screen Container (iPhone Canvas 390x844) -->
+<main class="relative w-[390px] h-[844px] paper-background overflow-hidden flex flex-col justify-between shadow-2xl rounded-[44px] border-[7px] border-[#D9D1C3]" style="transition: transform 0.25s; transform: scale(1);">
+<!-- Paper Vignette Texture Layer -->
+<div class="vignette-overlay absolute inset-0 pointer-events-none z-0"></div>
+<!-- BEGIN: TopBar -->
+<header class="relative z-10 w-full pt-12 px-6 flex items-center justify-end" data-purpose="header-skip">
+<!-- Skip Pill Button with hand-drawn subtle blue stroke -->
+<button aria-label="跳过开屏动画" class="sketchy-border px-3.5 py-1 text-xs font-medium tracking-wider text-accentBlue/90 bg-white/70 backdrop-blur-xs active:scale-95 transition-all duration-200 flex items-center space-x-1" type="button">
+<span class="font-hand text-sm font-semibold tracking-normal text-accentBlue">Skip</span>
+<span class="text-[10px] opacity-40 font-normal">/</span>
+<span class="text-[11px] font-gothic tracking-tight">跳过</span>
+</button>
+</header>
+<!-- END: TopBar -->
+<!-- BEGIN: MainContent -->
+<section class="relative z-10 flex-1 flex flex-col items-center justify-center -mt-6 px-6 text-center" data-purpose="splash-visual-center">
+<!-- Handwritten Title Block -->
+<div class="mb-4 space-y-1.5 animate-title" data-purpose="title-section">
+<h1 class="text-ink font-serif text-[23px] font-normal tracking-[0.16em] leading-relaxed drop-shadow-xs">
+          今天，也在好好爱自己
+        </h1>
+<div class="flex items-center justify-center space-x-2">
+<span class="h-[0.5px] w-5 bg-ink/20"></span>
+<p class="font-hand text-mutedInk text-[18px] tracking-wide -mt-0.5">
+            Love yourself today
+          </p>
+<span class="h-[0.5px] w-5 bg-ink/20"></span>
+</div>
+</div>
+<!-- Mascot Character Illustration Section -->
+<div class="relative w-[280px] h-[280px] flex items-center justify-center mt-1" data-purpose="tea-mascot-container">
+<!-- Tea Little Bun Character Image -->
+<div class="relative w-[240px] h-[240px] animate-float">
+<img alt="喝茶小人悠闲品茗插画" class="w-full h-full object-contain filter contrast-[1.02] drop-shadow-sm select-none pointer-events-none" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCXfmqWQ0aukCojnMOlIvoA0NASeJPtwxT9aU9MayPuK86-BAku1eYFMSMUh-YX1iI9G1_4k9OTGrtH2TREa_zd2qkQyS0n4_K-OgeQPcXWCCLHSXZZz2JdlGkN-hwpWb512IvJcChemQhhunyscM39R8uIOsKPDbNy-3szHSNFdGQnxg6_tvnnNpkLbBTJepHC3zNXipH8pXDqY6dgugipF3fZtu6NejZbdOZ4ytEkPfJPGmwZdhIu">
+<!-- Delicate Steam Line Art Overlay above the teacup -->
+<div class="absolute top-[82px] left-[118px] transform -translate-x-1/2 pointer-events-none animate-steam"><svg class="stroke-[#3B6691] drop-shadow-[0_0_2px_rgba(75,115,155,0.25)]" fill="none" height="44" viewBox="0 0 26 44" width="26" xmlns="http://www.w3.org/2000/svg"><path d="M13 42C13 37.5 7.5 33 7.5 27.5C7.5 21.5 18 19 18 12.5C18 7 11.5 4 13 1" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" opacity="0.8"></path><path d="M16 38C17 34 19 31 18 27C17 23 13 21 13.5 17" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.2" stroke-dasharray="2 2" opacity="0.45"></path></svg></div>
+</div>
+</div>
+</section>
+<!-- END: MainContent -->
+<!-- BEGIN: FooterGuide -->
+<footer class="relative z-10 pb-12 px-6 flex flex-col items-center justify-end text-center" data-purpose="bottom-interaction-hint">
+<!-- Subtle Touch Invitation Message -->
+<div class="animate-hint flex flex-col items-center space-y-2 cursor-pointer active:opacity-60 transition-opacity">
+<p class="text-mutedInk text-[12.5px] tracking-[0.14em] font-light flex items-center justify-center gap-1.5">
+<span>轻轻触碰，翻开属于你的清醒手账</span>
+<span class="text-accentBlue/70 text-[10px] animate-star">✦</span>
+</p>
+<!-- Hand-drawn curved line and delicate botanical leaf motif -->
+<div class="w-24 h-5 flex items-center justify-center opacity-45">
+<svg class="stroke-[#5B544E]" fill="none" height="16" viewBox="0 0 84 16" width="84" xmlns="http://www.w3.org/2000/svg">
+<!-- Soft hand-drawn horizontal arc -->
+<path d="M4 8.5C22 5 62 5 80 8.5" stroke-linecap="round" stroke-width="0.9"></path>
+<!-- Delicate mini center sprout / leaf motif -->
+<path d="M42 8C43.5 5 47 3 50 4.5C49 6.5 46 8 42 8Z" fill="#78866B" stroke="#5F6D54" stroke-width="0.7"></path>
+<path d="M42 8C40.5 5 37 3 34 4.5C35 6.5 38 8 42 8Z" fill="#78866B" stroke="#5F6D54" stroke-width="0.7"></path>
+</svg>
+</div>
+</div>
+<!-- iOS Home Bar Indicator Space (Natural fit for iOS devices) -->
+<div class="w-32 h-1 bg-[#D1C6B4]/60 rounded-full mt-6"></div>
+</footer>
+<!-- END: FooterGuide -->
+</main>
+<!-- END: Phone Screen Container -->
+<!-- BEGIN: Interactive Feedback Script -->
+<script data-purpose="touch-transition">
+    // Optional tactile feedback interaction for tapping the screen
+    document.addEventListener('DOMContentLoaded', () => {
+      const container = document.querySelector('main');
+      if (container) {
+        container.addEventListener('click', () => {
+          // Subtle click animation feedback
+          container.style.transition = 'transform 0.25s ease';
+          container.style.transform = 'scale(0.996)';
+          setTimeout(() => {
+            container.style.transform = 'scale(1)';
+          }, 200);
+        });
+      }
+    });
+  </script>
+<!-- END: Interactive Feedback Script -->
+
+
+</body></html>
