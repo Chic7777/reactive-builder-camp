@@ -2,62 +2,79 @@
 <html lang="zh-CN">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#fff7f9">
   <title>恋爱脑清醒日历 / Love-Brain Clarity Calendar</title>
   <meta name="description" content="一张软软的月历，安静见证你把恋爱脑念头放下。日记只留在浏览器。">
   <link rel="stylesheet" href="./css/calendar.css">
 </head>
 <body>
-  <div class="topbar" role="navigation" aria-label="Language">
-    <button type="button" class="lang-btn" id="langZh" aria-pressed="true">中文</button>
-    <button type="button" class="lang-btn" id="langEn" aria-pressed="false">English</button>
-  </div>
+  <div class="phone" id="phoneShell">
+    <header class="topbar">
+      <div class="topbar-left">
+        <span class="badge demo-badge" id="demoBadge" hidden>演示中</span>
+      </div>
+      <div class="topbar-right" role="navigation" aria-label="Language">
+        <button type="button" class="lang-btn" id="langZh" aria-pressed="true">中文</button>
+        <button type="button" class="lang-btn" id="langEn" aria-pressed="false">EN</button>
+      </div>
+    </header>
 
-  <header class="hero">
-    <h1 class="brand" id="brand">恋爱脑清醒日历<span>Love-Brain Clarity Calendar</span></h1>
-    <p class="lead" id="lead">一张软软的月历，安静见证你把恋爱脑念头放下，继续好好生活。日记只留在这台浏览器里。</p>
-    <p class="living-well" id="livingWell">恭喜你，依旧在好好生活</p>
-    <div class="hero-actions">
-      <button type="button" class="ghost" id="btnDemo">演示模式（无需钱包）</button>
-      <button type="button" class="primary" id="btnConnect">连接 MetaMask</button>
-    </div>
-  </header>
-
-  <main class="shell">
-    <div class="month-head">
-      <button type="button" class="ghost" id="prevMonth" aria-label="Previous month">←</button>
-      <h2 id="monthTitle">Month</h2>
-      <button type="button" class="ghost" id="nextMonth" aria-label="Next month">→</button>
-    </div>
-    <div class="weekdays" id="weekdays" aria-hidden="true"></div>
-    <div class="grid" id="grid" role="grid" aria-label="Calendar"></div>
-
-    <section class="panel" id="panel" aria-live="polite">
-      <div class="panel-bg" id="panelBg"></div>
-      <div class="panel-body">
-        <h3 id="panelTitle">写下今天</h3>
-        <div id="linkBox" class="link-box"></div>
-        <label class="note" for="entryText">日记只存 localStorage · Diary stays in localStorage</label>
-        <textarea id="entryText" maxlength="2000" placeholder="例如：他今天没理我，他是不是不爱我"></textarea>
-        <p class="note" id="oracleLabel">毒舌神谕</p>
-        <p class="oracle" id="oracle"></p>
-        <div class="row">
-          <button type="button" class="primary" id="btnSave">保存到本地</button>
-          <button type="button" class="danger-soft" id="btnPledge">我愿意彻底放下，继续好好生活</button>
-          <button type="button" class="ghost" id="btnDemoRelease">演示：标记彻底放下 / Demo release</button>
-        </div>
-        <p class="note" id="chainHint">链上只会发送无内容的 touch / 放下承诺。</p>
-        <p class="status" id="status"></p>
+    <section class="hero">
+      <h1 class="brand" id="brand">恋爱脑清醒日历<span>Love-Brain Clarity Calendar</span></h1>
+      <p class="lead" id="lead">一张软软的月历，安静见证你把恋爱脑念头放下。</p>
+      <p class="living-well" id="livingWell">恭喜你，依旧在好好生活</p>
+      <div class="hero-actions">
+        <button type="button" class="primary" id="btnDemo">进入演示模式</button>
+        <button type="button" class="ghost" id="btnSeed">填入示例数据</button>
+        <button type="button" class="ghost" id="btnConnect">连接 MetaMask</button>
       </div>
     </section>
-  </main>
 
-  <footer>
-    赛道 2 · Set It and Forget It · 测试网 · 运行时无 AI ·
-    正文永不 on-chain。部署指南见 <code>docs/calendar-deploy.md</code>。
-  </footer>
+    <main class="shell">
+      <div class="month-head">
+        <button type="button" class="ghost icon-btn" id="prevMonth" aria-label="Previous month">←</button>
+        <h2 id="monthTitle">Month</h2>
+        <button type="button" class="ghost icon-btn" id="nextMonth" aria-label="Next month">→</button>
+      </div>
+      <div class="weekdays" id="weekdays" aria-hidden="true"></div>
+      <div class="grid" id="grid" role="grid" aria-label="Calendar"></div>
+      <p class="hint" id="tapHint">点某一天写下恋爱脑 · Tap a day to write</p>
+    </main>
 
-  <script src="https://cdn.jsdelivr.net/npm/ethers@6.13.4/dist/ethers.umd.min.js"></script>
+    <footer class="foot" id="footerNote">
+      赛道 2 · 测试网 · 运行时无 AI · 正文只在本机
+    </footer>
+  </div>
+
+  <div class="sheet-backdrop" id="sheetBackdrop" hidden></div>
+  <section class="sheet" id="panel" aria-live="polite" hidden>
+    <div class="sheet-handle" aria-hidden="true"></div>
+    <div class="panel-bg" id="panelBg"></div>
+    <div class="panel-body">
+      <div class="sheet-top">
+        <h3 id="panelTitle">写下今天</h3>
+        <button type="button" class="ghost icon-btn" id="btnCloseSheet" aria-label="Close">✕</button>
+      </div>
+      <div id="linkBox" class="link-box"></div>
+      <label class="note" for="entryText" id="entryLabel">日记只存本机浏览器</label>
+      <textarea id="entryText" maxlength="2000" placeholder="例如：他今天没理我，他是不是不爱我"></textarea>
+      <p class="note" id="oracleLabel">毒舌神谕</p>
+      <p class="oracle" id="oracle"></p>
+      <div class="stack">
+        <button type="button" class="primary" id="btnSave">保存到本地</button>
+        <button type="button" class="danger-soft" id="btnPledge">我愿意彻底放下，继续好好生活</button>
+        <button type="button" class="ghost" id="btnDemoRelease">演示：标记彻底放下</button>
+      </div>
+      <p class="note" id="chainHint">演示模式不上链；连接钱包后才会发 touch / pledge。</p>
+      <p class="status" id="status"></p>
+    </div>
+  </section>
+
+  <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
+  <!-- ethers 可选：CDN 失败不影响演示模式 -->
+  <script src="https://cdn.jsdelivr.net/npm/ethers@6.13.4/dist/ethers.umd.min.js" onerror="window.__ethersFailed=true"></script>
   <script src="./config.js"></script>
   <script src="./js/oracle.js"></script>
   <script src="./js/storage.js"></script>

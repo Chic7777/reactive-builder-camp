@@ -1,3 +1,4 @@
+// 钱包模块：ethers 未加载时仍可安全存在，演示模式不调用 connect。
 window.ClarityWallet = (function () {
   let provider = null;
   let signer = null;
@@ -16,6 +17,10 @@ window.ClarityWallet = (function () {
     "event ThreadTouched(address indexed user, uint256 indexed threadId, uint256 timestamp)"
   ];
 
+  function ethersReady() {
+    return typeof window.ethers !== "undefined" && window.ethers && window.ethers.BrowserProvider;
+  }
+
   function threadIdFromReceipt(receipt) {
     if (!contract || !receipt) return null;
     for (const log of receipt.logs || []) {
@@ -28,6 +33,7 @@ window.ClarityWallet = (function () {
   }
 
   async function connect(cfg) {
+    if (!ethersReady()) throw new Error("NO_ETHERS");
     if (!window.ethereum) throw new Error("NO_METAMASK");
     provider = new ethers.BrowserProvider(window.ethereum);
     await provider.send("eth_requestAccounts", []);
@@ -87,5 +93,15 @@ window.ClarityWallet = (function () {
     return { tx, receipt: await tx.wait() };
   }
 
-  return { connect, getContract, getSigner, openThread, linkAndTouch, touch, pledgeLetGo, threadIdFromReceipt };
+  return {
+    ethersReady,
+    connect,
+    getContract,
+    getSigner,
+    openThread,
+    linkAndTouch,
+    touch,
+    pledgeLetGo,
+    threadIdFromReceipt
+  };
 })();

@@ -52,7 +52,9 @@ powershell -ExecutionPolicy Bypass -File .\script\verify-calendar.ps1
 
 `preflight` 会跑 `forge test --match-path test/CalendarPath.t.sol --evm-version cancun`，并检查余额；**余额不够会停住，不会广播**。
 
-把 `.env` 里的 `CALENDAR_ADDR` 抄到 `app/config.js` 的 `calendarAddress`，用浏览器打开 `app/index.html`（或 GitHub Pages）。演示模式不连钱包也能预览日记与神谕。
+把 `.env` 里的 `CALENDAR_ADDR` 抄到 `app/config.js` 的 `calendarAddress`。
+
+网页可直接双击 `app/index.html`（`file://`）预览：点「进入演示模式」会出「演示中」徽章并弹出写日记层；也可「填入示例数据」。不依赖 `fetch`，ethers CDN 失败也不影响演示。手机宽度优先；电脑上会居中成约 430px 卡片。也可挂到 GitHub Pages。
 
 ## 链上在记什么
 
