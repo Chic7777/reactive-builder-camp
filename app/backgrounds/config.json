@@ -1,0 +1,12 @@
+{
+  "note": "把 Midjourney 图放到本目录，文件名与 category 一致即可。现在用 CSS/SVG 渐变占位。",
+  "categories": {
+    "ignored": { "file": "ignored.svg", "fallbackCss": "bg-ignored" },
+    "rumination": { "file": "rumination.svg", "fallbackCss": "bg-rumination" },
+    "urgeToText": { "file": "urgeToText.svg", "fallbackCss": "bg-urge" },
+    "jealousy": { "file": "jealousy.svg", "fallbackCss": "bg-jealousy" },
+    "reunion": { "file": "reunion.svg", "fallbackCss": "bg-reunion" },
+    "selfDoubt": { "file": "selfDoubt.svg", "fallbackCss": "bg-selfdoubt" },
+    "fallback": { "file": "fallback.svg", "fallbackCss": "bg-fallback" }
+  }
+}
