@@ -1,0 +1,18 @@
+[
+  "function CLARITY_DEMO() view returns (bool)",
+  "function reactive() view returns (address)",
+  "function nextThreadId(address user) view returns (uint256)",
+  "function find(address user, uint256 threadId) view returns (uint256)",
+  "function isPledged(address user, uint256 threadId) view returns (bool)",
+  "function isReleased(address user, uint256 threadId) view returns (bool)",
+  "function lastTouchAt(address user, uint256 threadId) view returns (uint64)",
+  "function openThread() returns (uint256)",
+  "function touch(uint256 threadId)",
+  "function linkAndTouch(uint256[] threadIds) returns (uint256)",
+  "function merge(uint256 a, uint256 b) returns (uint256)",
+  "function pledgeLetGo(uint256 threadId)",
+  "event ThreadTouched(address indexed user, uint256 indexed threadId, uint256 timestamp)",
+  "event LetGoPledged(address indexed user, uint256 indexed threadId, uint256 timestamp)",
+  "event ThreadsMerged(address indexed user, uint256 indexed fromId, uint256 indexed intoId)",
+  "event ThreadReleased(address indexed reactive, address indexed user, uint256 indexed threadId, uint256 timestamp)"
+]
