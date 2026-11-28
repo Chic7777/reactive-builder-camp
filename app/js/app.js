@@ -33,15 +33,20 @@
       relatedTitle: "和旧心结有关 🫧",
       relatedSub: "关联之前的日子",
       priorHead: "轻按贴纸关联往昔记录",
+      multiSelect: "可多选哦",
+      pickFromCal: "📅 从日历选择",
+      hideCalPicker: "收起日历选择",
       continueWrite: "✏️ 继续写下细节",
       linkedCount: "已关联 {n} 个心结",
       later: "稍后再记 · 先去抱抱自己 🧸",
       writeTitle: "坦诚写下这一刻的想法",
       writeSub: "这里没有批判，只有接纳与清醒",
       writePrompt: "揉揉脑袋：是事实如此，还是委屈小剧场又在偷偷加戏啦？",
+      writePlaceholder: "把心里的小泡泡写下来…",
       moodLabel: "为此刻的心情贴上小标签 · 可多选",
       saveOnly: "先存起来 (慢慢想)",
       pledge: "我愿意放下啦",
+      pledgedWaiting: "🌷 已承诺 · 等待平静",
       oracleTag: "✦ 醒脑时刻",
       tuck: "我清醒了 · 收进月历手账",
       dismiss: "轻触任意处收起并返回",
@@ -59,6 +64,7 @@
       noMeta: "未检测到 MetaMask，请用演示模式。",
       connected: "已连接",
       connect: "连接钱包",
+      openingHtml: "今天，也在<span class=\"flash\">好好爱自己</span>",
       week: ["一", "二", "三", "四", "五", "六", "日"],
       dow: ["星期日", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六"]
     },
@@ -95,15 +101,20 @@
       relatedTitle: "Tied to an old knot 🫧",
       relatedSub: "Link earlier days",
       priorHead: "Tap stickers to link past notes",
+      multiSelect: "multi-select",
+      pickFromCal: "📅 Pick from calendar",
+      hideCalPicker: "Hide calendar picker",
       continueWrite: "✏️ Continue writing",
-      linkedCount: "{n} knots linked",
+      linkedCount: "{n} knot(s) linked",
       later: "Later · go hug yourself first 🧸",
       writeTitle: "Write this moment honestly",
       writeSub: "No judgment here—only acceptance and clarity",
       writePrompt: "Rub your head: fact—or the drama theater improvising again?",
+      writePlaceholder: "Write your little bubbles here…",
       moodLabel: "Stick mood labels · multi-select",
       saveOnly: "Save for now (think slow)",
       pledge: "I'm willing to let go",
+      pledgedWaiting: "🌷 Pledged · waiting calm",
       oracleTag: "✦ Wake-up moment",
       tuck: "I'm clear · tuck into calendar",
       dismiss: "Tap anywhere to close",
@@ -121,6 +132,7 @@
       noMeta: "No MetaMask—use demo.",
       connected: "Connected",
       connect: "Connect wallet",
+      openingHtml: "Today, <span class=\"flash\">love yourself well</span>",
       week: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
       dow: ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
     }
@@ -140,13 +152,29 @@
   let writeMoods = [];
   let pendingOracleDay = null;
   let clockTimer = null;
+  let linkCalView = new Date();
+  let linkCalOpen = false;
 
   function $(id) { return document.getElementById(id); }
   function setText(id, value) {
     const el = $(id);
     if (el) el.textContent = value;
   }
+  function setHtml(id, value) {
+    const el = $(id);
+    if (el) el.innerHTML = value;
+  }
   function t() { return i18n[state.lang] || i18n.zh; }
+
+  function entryTextOf(entry) {
+    if (!entry) return "";
+    if (entry.textZh != null || entry.textEn != null) {
+      return state.lang === "en"
+        ? (entry.textEn || entry.textZh || entry.text || "")
+        : (entry.textZh || entry.textEn || entry.text || "");
+    }
+    return entry.text || "";
+  }
 
   function dayKey(d) {
     const y = d.getFullYear();
@@ -222,12 +250,17 @@
     document.querySelectorAll(".dot").forEach(function (dot) {
       dot.classList.toggle("active", Number(dot.getAttribute("data-dot")) === pageIndex);
     });
+    document.querySelectorAll(".page").forEach(function (page) {
+      const active = Number(page.getAttribute("data-page")) === pageIndex;
+      page.classList.toggle("is-active", active);
+      if (!active) page.scrollTop = 0;
+    });
     setText("swipeHint", pageIndex === 0 ? t().swipeHome : t().swipeCal);
   }
 
   function bindSwipe() {
-    const pager = $("pager");
-    if (!pager) return;
+    const clip = document.querySelector(".pager-clip") || $("pager");
+    if (!clip) return;
     let startX = 0;
     let startY = 0;
     let tracking = false;
@@ -247,15 +280,15 @@
       else if (dx > 0 && pageIndex === 1) setPage(0);
     }
 
-    pager.addEventListener("touchstart", function (e) {
+    clip.addEventListener("touchstart", function (e) {
       if (!e.touches[0]) return;
       down(e.touches[0].clientX, e.touches[0].clientY);
     }, { passive: true });
-    pager.addEventListener("touchend", function (e) {
+    clip.addEventListener("touchend", function (e) {
       const tch = e.changedTouches[0];
       if (tch) up(tch.clientX, tch.clientY);
     }, { passive: true });
-    pager.addEventListener("mousedown", function (e) {
+    clip.addEventListener("mousedown", function (e) {
       down(e.clientX, e.clientY);
     });
     window.addEventListener("mouseup", function (e) {
@@ -266,8 +299,11 @@
   function paintChrome() {
     const copy = t();
     setText("btnSkip", copy.skip);
+    setHtml("openingTitle", copy.openingHtml);
     setText("openingSub", copy.openingSub);
     setText("openingHint", copy.openingHint);
+    const ta = $("entryText");
+    if (ta) ta.placeholder = copy.writePlaceholder;
     setText("homeKaomoji", copy.kaomoji);
     setText("blessFoot", copy.blessFoot);
     setText("trashTitle", copy.trashTitle);
@@ -490,7 +526,7 @@
     const moods = (entry.moods || []).map(moodLabel).join(" · ");
     const when = formatClock(new Date(entry.createdAt || Date.now()));
     setText("detailMeta", key + " · " + when + (moods ? " · " + moods : ""));
-    setText("detailText", entry.text || "");
+    setText("detailText", entryTextOf(entry));
     const oracle = $("detailOracle");
     if (oracle) {
       if (entry.oracleZh || entry.oracleEn) {
@@ -504,7 +540,7 @@
     if (pledgeBtn) {
       pledgeBtn.hidden = !!entry.released;
       pledgeBtn.textContent = entry.pledged && !entry.released
-        ? (state.lang === "zh" ? "🌷 已承诺 · 等待平静" : "🌷 Pledged · waiting calm")
+        ? t().pledgedWaiting
         : t().willing;
     }
   }
@@ -550,6 +586,86 @@
     setText("btnLinkContinue", base + extra + " →");
   }
 
+  function toggleLinkDay(day, key) {
+    const idx = pendingLinks.indexOf(day);
+    if (idx >= 0) pendingLinks.splice(idx, 1);
+    else pendingLinks.push(day);
+    renderPriorStickers(key);
+    updateLinkContinueLabel();
+  }
+
+  function renderLinkCalPicker(key, host) {
+    const y = linkCalView.getFullYear();
+    const m = linkCalView.getMonth();
+    const picker = document.createElement("div");
+    picker.className = "link-cal-picker";
+    picker.id = "linkCalPicker";
+
+    const nav = document.createElement("div");
+    nav.className = "link-cal-nav";
+    const prev = document.createElement("button");
+    prev.type = "button";
+    prev.textContent = "‹";
+    prev.addEventListener("click", function () {
+      linkCalView = new Date(y, m - 1, 1);
+      renderPriorStickers(key);
+    });
+    const next = document.createElement("button");
+    next.type = "button";
+    next.textContent = "›";
+    next.addEventListener("click", function () {
+      linkCalView = new Date(y, m + 1, 1);
+      renderPriorStickers(key);
+    });
+    const title = document.createElement("strong");
+    title.textContent = state.lang === "zh"
+      ? (y + "年" + (m + 1) + "月")
+      : linkCalView.toLocaleString("en", { month: "long", year: "numeric" });
+    nav.appendChild(prev);
+    nav.appendChild(title);
+    nav.appendChild(next);
+    picker.appendChild(nav);
+
+    const week = document.createElement("div");
+    week.className = "link-cal-week";
+    t().week.forEach(function (w) {
+      const s = document.createElement("span");
+      s.textContent = w;
+      week.appendChild(s);
+    });
+    picker.appendChild(week);
+
+    const grid = document.createElement("div");
+    grid.className = "link-cal-grid";
+    const first = new Date(y, m, 1);
+    const startPad = (first.getDay() + 6) % 7;
+    const daysInMonth = new Date(y, m + 1, 0).getDate();
+    for (let i = 0; i < startPad; i++) {
+      const empty = document.createElement("button");
+      empty.type = "button";
+      empty.className = "link-cal-day";
+      empty.disabled = true;
+      grid.appendChild(empty);
+    }
+    for (let d = 1; d <= daysInMonth; d++) {
+      const date = new Date(y, m, d);
+      const dk = dayKey(date);
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.textContent = String(d);
+      const has = !!state.entries[dk] && dk < key;
+      btn.className = "link-cal-day" + (has ? " has-entry" : "") + (pendingLinks.indexOf(dk) >= 0 ? " sel" : "");
+      if (!has) {
+        btn.disabled = true;
+      } else {
+        btn.addEventListener("click", function () { toggleLinkDay(dk, key); });
+      }
+      grid.appendChild(btn);
+    }
+    picker.appendChild(grid);
+    host.appendChild(picker);
+  }
+
   function renderPriorStickers(key) {
     const box = $("priorStickers");
     if (!box) return;
@@ -557,11 +673,39 @@
     if (linkMode !== "related" || !priors.length) {
       box.hidden = true;
       box.innerHTML = "";
+      linkCalOpen = false;
       return;
     }
     box.hidden = false;
+    box.className = "prior-section";
+    box.innerHTML = "";
+
+    const head = document.createElement("div");
+    head.className = "prior-head-row";
+    const label = document.createElement("p");
+    label.className = "mood-label";
+    label.textContent = t().priorHead;
+    const tag = document.createElement("span");
+    tag.className = "multi-tag";
+    tag.textContent = t().multiSelect;
+    head.appendChild(label);
+    head.appendChild(tag);
+    box.appendChild(head);
+
+    const pickBtn = document.createElement("button");
+    pickBtn.type = "button";
+    pickBtn.className = "btn-pick-cal";
+    pickBtn.id = "btnPickCalendar";
+    pickBtn.textContent = linkCalOpen ? t().hideCalPicker : t().pickFromCal;
+    pickBtn.addEventListener("click", function () {
+      linkCalOpen = !linkCalOpen;
+      renderPriorStickers(key);
+    });
+    box.appendChild(pickBtn);
+
+    if (linkCalOpen) renderLinkCalPicker(key, box);
+
     const colors = ["#FFF0F0", "#FFF8E7", "#EEF5FF", "#F0FFF4"];
-    box.innerHTML = "<p class=\"mood-label\">" + t().priorHead + " · 多选</p>";
     const grid = document.createElement("div");
     grid.className = "prior-grid";
     priors.slice(0, 8).forEach(function (d, i) {
@@ -571,19 +715,13 @@
       btn.className = "prior-sticker" + (pendingLinks.indexOf(d) >= 0 ? " sel" : "");
       btn.style.background = colors[i % colors.length];
       const date = parseKey(d);
-      const label = state.lang === "zh"
+      const dateLabel = state.lang === "zh"
         ? ((date.getMonth() + 1) + "月" + date.getDate() + "日")
         : date.toLocaleDateString("en-US", { month: "short", day: "numeric" });
-      const snippet = (e.text || "").slice(0, 28);
+      const snippet = entryTextOf(e).slice(0, 28);
       const sticker = e.sticker || ClarityOracle.stickerFor(d, e.tone || "gentle");
-      btn.innerHTML = "<span class=\"pi\">" + sticker + "</span><div class=\"pd\">" + label + "</div><div class=\"ps\">" + snippet + "</div>";
-      btn.addEventListener("click", function () {
-        const idx = pendingLinks.indexOf(d);
-        if (idx >= 0) pendingLinks.splice(idx, 1);
-        else pendingLinks.push(d);
-        renderPriorStickers(key);
-        updateLinkContinueLabel();
-      });
+      btn.innerHTML = "<span class=\"pi\">" + sticker + "</span><div class=\"pd\">" + dateLabel + "</div><div class=\"ps\">" + snippet + "</div>";
+      btn.addEventListener("click", function () { toggleLinkDay(d, key); });
       grid.appendChild(btn);
     });
     box.appendChild(grid);
@@ -594,6 +732,8 @@
     selected = today;
     linkMode = Object.keys(state.entries).some(function (k) { return k < today; }) ? "related" : "fresh";
     pendingLinks = [];
+    linkCalOpen = false;
+    linkCalView = new Date();
     const fresh = $("choiceFresh");
     const related = $("choiceRelated");
     if (fresh) fresh.classList.toggle("selected", linkMode === "fresh");
@@ -609,7 +749,10 @@
       ? state.entries[selected].moods.slice()
       : [];
     const ta = $("entryText");
-    if (ta) ta.value = (state.entries[selected] && state.entries[selected].text) || "";
+    if (ta) {
+      ta.value = entryTextOf(state.entries[selected]);
+      ta.placeholder = t().writePlaceholder;
+    }
     setText("charCount", String((ta && ta.value.length) || 0));
     renderMoodChips();
     showSheet("sheetWrite", "writeBackdrop");
@@ -875,20 +1018,35 @@
     const d3 = shiftDay(today, -2);
     const calm = shiftDay(today, -8);
     state.entries = {};
-    state.entries[d1] = makeEntry(d1, "他已读不回，是不是不爱我了", { threadLocalId: 1, moods: ["anxious", "rumination"] });
-    state.entries[d2] = makeEntry(d2, "想主动发消息，又怕显得很着急", { threadLocalId: 1, linkedDays: [d1], moods: ["overthink"] });
+    state.entries[d1] = makeEntry(d1, "他已读不回，是不是不爱我了", {
+      threadLocalId: 1,
+      moods: ["anxious", "rumination"],
+      textZh: "他已读不回，是不是不爱我了",
+      textEn: "He read it and didn't reply—does that mean he doesn't love me?"
+    });
+    state.entries[d2] = makeEntry(d2, "想主动发消息，又怕显得很着急", {
+      threadLocalId: 1,
+      linkedDays: [d1],
+      moods: ["overthink"],
+      textZh: "想主动发消息，又怕显得很着急",
+      textEn: "Want to text first, but afraid of looking too eager."
+    });
     state.entries[d3] = makeEntry(d3, "看到他朋友圈，有点嫉妒", {
       threadLocalId: 1,
       linkedDays: [d1, d2],
       pledged: true,
-      moods: ["wronged"]
+      moods: ["wronged"],
+      textZh: "看到他朋友圈，有点嫉妒",
+      textEn: "Saw his social posts and felt a little jealous."
     });
     state.entries[calm] = makeEntry(calm, "以前想复合，现在决定好好生活", {
       threadLocalId: 2,
       linkedDays: [],
       pledged: true,
       released: true,
-      moods: ["hug"]
+      moods: ["hug"],
+      textZh: "以前想复合，现在决定好好生活",
+      textEn: "I used to want him back; now I choose to live well."
     });
     localThreadSeq = 3;
     state.demo = true;
@@ -920,24 +1078,15 @@
   }
 
   function finishOpening() {
-    ClarityStorage.markOpeningSeen();
     const opening = $("opening");
-    const shell = $("appShell");
     if (opening) opening.hidden = true;
-    if (shell) shell.hidden = false;
     paintUI();
     setPage(0);
   }
 
   function startOpening() {
+    // Every page load / refresh shows opening; Skip only dismisses this session.
     const opening = $("opening");
-    const shell = $("appShell");
-    if (ClarityStorage.openingSeenToday()) {
-      if (opening) opening.hidden = true;
-      if (shell) shell.hidden = false;
-      return;
-    }
-    if (shell) shell.hidden = true;
     if (opening) opening.hidden = false;
   }
 
@@ -1070,9 +1219,10 @@
     });
     bind();
     startOpening();
-    if (!$("appShell").hidden) paintUI();
+    paintChrome();
+    applyBackground();
     clockTimer = setInterval(function () {
-      if ($("appShell") && !$("appShell").hidden) {
+      if ($("opening") && $("opening").hidden) {
         setText("homeClock", formatClock(new Date()));
         applyBackground();
       }

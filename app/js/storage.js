@@ -1,6 +1,5 @@
 window.ClarityStorage = (function () {
   const KEY = "love-brain-clarity-v2";
-  const OPENING_KEY = "love-brain-opening-date";
 
   function load() {
     try {
@@ -44,19 +43,10 @@ window.ClarityStorage = (function () {
     return d.getFullYear() + "-" + m + "-" + day;
   }
 
-  function openingSeenToday() {
-    try {
-      return localStorage.getItem(OPENING_KEY) === todayKey();
-    } catch {
-      return false;
-    }
-  }
+  // Clear legacy once-per-day opening flag if present
+  try {
+    localStorage.removeItem("love-brain-opening-date");
+  } catch (_) {}
 
-  function markOpeningSeen() {
-    try {
-      localStorage.setItem(OPENING_KEY, todayKey());
-    } catch (_) {}
-  }
-
-  return { KEY, load, save, todayKey, openingSeenToday, markOpeningSeen };
+  return { KEY, load, save, todayKey };
 })();
