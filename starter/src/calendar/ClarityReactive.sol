@@ -159,13 +159,21 @@ contract ClarityReactive is AbstractReactive {
 
         Watch storage w = watches[user][threadId];
         if (ts >= w.lastTouchAt) w.lastTouchAt = ts;
-        if (w.released) w.released = false;
-        if (isPledge) w.pledged = true;
-        emit ThreadNoted(user, threadId, ts, isPledge ? bytes32("pledge") : bytes32("touch"));
 
-        if (w.pledged && !w.released) {
+        if (isPledge) {
+            // 放下中：入队等窗口
+            w.released = false;
+            w.pledged = true;
+            emit ThreadNoted(user, threadId, ts, bytes32("pledge"));
             _enqueue(user, uint64(threadId));
             if (!subscribedCron && !stopped) _setCronSubscription(true);
+        } else {
+            // 用户 touch = 新的关联写入 → 没放下；出队，旧窗口到期也不能释放
+            w.released = false;
+            w.pledged = false;
+            emit ThreadNoted(user, threadId, ts, bytes32("touch"));
+            _dequeue(user, uint64(threadId));
+            if (queue.length == 0 && subscribedCron) _setCronSubscription(false);
         }
     }
 

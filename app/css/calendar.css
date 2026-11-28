@@ -382,6 +382,11 @@ img { max-width: 100%; display: block; }
   color: var(--sky-deep);
   border: 1.5px solid #b7d2f7;
 }
+.btn-secondary:disabled {
+  opacity: 0.9;
+  cursor: default;
+  box-shadow: none;
+}
 .btn-ghost {
   width: auto;
   min-height: 40px;

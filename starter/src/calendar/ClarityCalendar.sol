@@ -8,7 +8,8 @@ import { CalendarGuard } from "./CalendarGuard.sol";
 /// @title ClarityCalendar — Sepolia 上的恋爱脑清醒日历（源链事件 + 目标链回调同一合约）
 /// @notice 链上只记「一团念头」的触碰、放下承诺与彻底放下。日记正文不在这里。
 /// @dev    部署顺序：先本合约（Proxy + ETH），再 Lasna ClarityReactive，再 bindReactive。
-///         触碰已彻底放下的 thread 会重新打开（released=false）；若仍已承诺则窗口重计。
+///         用户 touch（新的关联写入）把整团打回「没放下」：clears pledged + released。
+///         只有 pledgeLetGo 进入「放下中」；窗口内无新关联写入才 markReleased →「已放下」。
 ///         markReleased 必须极省 gas：Proxy 大约只转出 155800。根状态打进一个槽。
 contract ClarityCalendar is AbstractPayer {
     /// @notice 给脚本和网页一个固定标记。
@@ -92,7 +93,7 @@ contract ClarityCalendar is AbstractPayer {
         return _openThread(msg.sender);
     }
 
-    /// @notice 触碰已有一团。若已彻底放下，则重新打开。
+    /// @notice 触碰已有一团（新的关联写入）。整团回到「没放下」：清除 pledged 与 released。
     function touch(uint256 threadId) external {
         _touchRoot(msg.sender, find(msg.sender, threadId), true);
     }
@@ -211,16 +212,26 @@ contract ClarityCalendar is AbstractPayer {
         return ra;
     }
 
+    /// @dev mayReopen=true：用户 touch / linkAndTouch → 没放下（清 pledged+released）。
+    ///      mayReopen=false：仅 openThread 初次写入 touch 时间，状态已是未承诺。
     function _touchRoot(address user, uint256 root, bool mayReopen) internal {
         ThreadMeta storage m = _meta[user][root];
         uint256 pack = _rootPack[user][root];
-        if (mayReopen && m.released) {
-            m.released = false;
-            pack = _setFlag(pack, 16, false);
-            pack = (pack & ~(((uint256(1) << 64) - 1) << 152));
+        if (mayReopen) {
+            if (m.pledged) {
+                m.pledged = false;
+                pack = _setFlag(pack, 8, false);
+                pack = (pack & ~(((uint256(1) << 64) - 1) << 88));
+            }
+            if (m.released) {
+                m.released = false;
+                pack = _setFlag(pack, 16, false);
+                pack = (pack & ~(((uint256(1) << 64) - 1) << 152));
+            }
         }
         pack = _setFlag(pack, 0, true);
         pack = _setFlag(pack, 8, m.pledged);
+        pack = _setFlag(pack, 16, m.released);
         pack = (pack & ~(((uint256(1) << 64) - 1) << 24)) | (uint256(uint64(block.timestamp)) << 24);
         _rootPack[user][root] = pack;
         emit ThreadTouched(user, root, block.timestamp);

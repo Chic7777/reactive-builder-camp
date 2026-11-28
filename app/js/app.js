@@ -22,6 +22,8 @@
       todayBtn: "回到今天",
       detailPrefix: "清醒手账存根",
       willing: "🌷 愿意放下",
+      pledgedWaiting: "🌷 放下中 · 等待平静",
+      releasedLabel: "🌷 已放下 · 好好生活",
       oracleStub: "🔖 毒舌清醒糖纸",
       swipeHome: "右滑翻开手账小日历呀 →",
       swipeCal: "← 左滑回首页抱抱自己",
@@ -46,7 +48,6 @@
       moodLabel: "为此刻的心情贴上小标签 · 可多选",
       saveOnly: "先存起来 (慢慢想)",
       pledge: "我愿意放下啦",
-      pledgedWaiting: "🌷 已承诺 · 等待平静",
       oracleTag: "✦ 醒脑时刻",
       tuck: "我清醒了 · 收进月历手账",
       dismiss: "轻触任意处收起并返回",
@@ -57,9 +58,9 @@
       txTouch: "已发送",
       txPledge: "已承诺放下",
       seeded: "已填入示例。",
-      pledgedDemo: "已记下放下的心愿。",
-      fastForwarded: "时间快进：已承诺的团变平静了。",
-      fastForwardEmpty: "没有待放下的承诺。",
+      pledgedDemo: "整团进入放下中。",
+      fastForwarded: "时间快进：放下中的团变为已放下。",
+      fastForwardEmpty: "没有处于放下中的团。",
       noEthers: "钱包不可用，请用演示模式。",
       noMeta: "未检测到 MetaMask，请用演示模式。",
       connected: "已连接",
@@ -90,6 +91,8 @@
       todayBtn: "Back to today",
       detailPrefix: "Clarity journal stub",
       willing: "🌷 Willing to let go",
+      pledgedWaiting: "🌷 Letting go · waiting calm",
+      releasedLabel: "🌷 Released · living well",
       oracleStub: "🔖 Clarity candy wrapper",
       swipeHome: "Swipe for the calendar →",
       swipeCal: "← Swipe home for a hug",
@@ -114,7 +117,6 @@
       moodLabel: "Stick mood labels · multi-select",
       saveOnly: "Save for now (think slow)",
       pledge: "I'm willing to let go",
-      pledgedWaiting: "🌷 Pledged · waiting calm",
       oracleTag: "✦ Wake-up moment",
       tuck: "I'm clear · tuck into calendar",
       dismiss: "Tap anywhere to close",
@@ -125,9 +127,9 @@
       txTouch: "Sent",
       txPledge: "Pledge sent",
       seeded: "Sample loaded.",
-      pledgedDemo: "Let-go wish noted.",
-      fastForwarded: "Fast-forward: pledged threads calmed.",
-      fastForwardEmpty: "Nothing waiting to release.",
+      pledgedDemo: "Whole thread is now letting go.",
+      fastForwarded: "Fast-forward: letting-go threads released.",
+      fastForwardEmpty: "No threads in letting-go.",
       noEthers: "Wallet unavailable—use demo.",
       noMeta: "No MetaMask—use demo.",
       connected: "Connected",
@@ -174,6 +176,39 @@
         : (entry.textZh || entry.textEn || entry.text || "");
     }
     return entry.text || "";
+  }
+
+  /** Thread-level let-go state: open | letting | released. Never per-day. */
+  function threadStatus(dayKeyStr) {
+    const days = ClarityGraph.threadDays(state.entries, dayKeyStr);
+    let anyLetting = false;
+    let anyReleased = false;
+    days.forEach(function (d) {
+      const e = state.entries[d];
+      if (!e) return;
+      if (e.pledged && !e.released) anyLetting = true;
+      if (e.released) anyReleased = true;
+    });
+    if (anyLetting) return "letting";
+    if (anyReleased) return "released";
+    return "open";
+  }
+
+  function setThreadFlags(dayKeyStr, flags) {
+    const days = ClarityGraph.threadDays(state.entries, dayKeyStr);
+    days.forEach(function (d) {
+      if (!state.entries[d]) return;
+      if (typeof flags.pledged === "boolean") state.entries[d].pledged = flags.pledged;
+      if (typeof flags.released === "boolean") state.entries[d].released = flags.released;
+    });
+    return days;
+  }
+
+  function syncThreadFlags(dayKeyStr) {
+    const status = threadStatus(dayKeyStr);
+    if (status === "letting") setThreadFlags(dayKeyStr, { pledged: true, released: false });
+    else if (status === "released") setThreadFlags(dayKeyStr, { pledged: true, released: true });
+    else setThreadFlags(dayKeyStr, { pledged: false, released: false });
   }
 
   function dayKey(d) {
@@ -404,7 +439,7 @@
         return d.getFullYear() === y && d.getMonth() === m;
       }).sort();
       if (days.length < 2) return;
-      const released = days.every(function (k) { return state.entries[k] && state.entries[k].released; });
+      const released = threadStatus(days[0]) === "released";
       for (let i = 0; i < days.length - 1; i++) {
         const a = grid.querySelector('[data-day="' + days[i] + '"]');
         const b = grid.querySelector('[data-day="' + days[i + 1] + '"]');
@@ -469,7 +504,7 @@
         if (selected === key) btn.classList.add("selected");
         if (entry) {
           btn.classList.add("has-entry");
-          if (entry.released) btn.classList.add("calm-thread");
+          if (threadStatus(key) === "released") btn.classList.add("calm-thread");
           const sticker = entry.sticker || ClarityOracle.stickerFor(key, entry.tone || "gentle");
           btn.innerHTML = "<span class=\"n\">" + d + "</span><span class=\"sticker\">" + sticker + "</span>";
         } else {
@@ -538,10 +573,20 @@
     }
     const pledgeBtn = $("btnPledgeFromCal");
     if (pledgeBtn) {
-      pledgeBtn.hidden = !!entry.released;
-      pledgeBtn.textContent = entry.pledged && !entry.released
-        ? t().pledgedWaiting
-        : t().willing;
+      const status = threadStatus(key);
+      if (status === "released") {
+        pledgeBtn.hidden = false;
+        pledgeBtn.disabled = true;
+        pledgeBtn.textContent = t().releasedLabel;
+      } else if (status === "letting") {
+        pledgeBtn.hidden = false;
+        pledgeBtn.disabled = true;
+        pledgeBtn.textContent = t().pledgedWaiting;
+      } else {
+        pledgeBtn.hidden = false;
+        pledgeBtn.disabled = false;
+        pledgeBtn.textContent = t().willing;
+      }
     }
   }
 
@@ -845,6 +890,7 @@
     }
 
     const prev = state.entries[selected] || {};
+    // Re-saving the same day keeps thread flags; a NEW related write resets below.
     const entry = {
       dayKey: selected,
       text: text,
@@ -858,9 +904,9 @@
       oracleArt: prev.oracleArt || null,
       sticker: prev.sticker || null,
       createdAt: prev.createdAt || Date.now(),
-      released: !!prev.released,
+      released: isNew ? false : !!prev.released,
       chainThreadId: prev.chainThreadId || null,
-      pledged: !!prev.pledged
+      pledged: isNew ? false : !!prev.pledged
     };
 
     if (!entry.oracleZh || opts.freshOracle) {
@@ -868,6 +914,14 @@
     }
 
     state.entries[selected] = entry;
+
+    // New day joining an existing thread (or linking into one) → whole thread 没放下.
+    if (isNew && linked.length > 0) {
+      setThreadFlags(selected, { pledged: false, released: false });
+    } else if (!isNew) {
+      syncThreadFlags(selected);
+    }
+
     ClarityStorage.save(state);
     return entry;
   }
@@ -946,10 +1000,8 @@
       toast(copy.needText);
       return;
     }
-    const group = ClarityGraph.threadDays(state.entries, key);
-    group.forEach(function (d) {
-      if (state.entries[d]) state.entries[d].pledged = true;
-    });
+    // Whole thread → 放下中
+    setThreadFlags(key, { pledged: true, released: false });
     ClarityStorage.save(state);
 
     if (state.demo || !canUseChain()) {
@@ -959,8 +1011,29 @@
     }
     try {
       let id = state.entries[key].chainThreadId;
-      if (!id) id = await chainTouchForDay(key);
+      // Pledge path: ensure chain thread exists, then pledgeLetGo (does not use touch-to-clear).
+      if (!id) {
+        const group = ClarityGraph.threadDays(state.entries, key);
+        const chainIds = ClarityGraph.onChainThreadIds(state.entries, group);
+        let result;
+        if (chainIds.length === 0) result = await ClarityWallet.openThread();
+        else if (chainIds.length === 1) result = await ClarityWallet.touch(chainIds[0]);
+        else result = await ClarityWallet.linkAndTouch(chainIds);
+        id = result.threadId || chainIds[0] || null;
+        if (!id) {
+          const n = await ClarityWallet.getContract().nextThreadId(walletAddr);
+          id = Number(n);
+        }
+        // touch/link cleared on-chain pledge; re-apply local 放下中 then pledge on chain
+        setThreadFlags(key, { pledged: true, released: false });
+        group.forEach(function (d) {
+          if (state.entries[d]) state.entries[d].chainThreadId = id;
+        });
+        ClarityStorage.save(state);
+      }
       await ClarityWallet.pledgeLetGo(id);
+      setThreadFlags(key, { pledged: true, released: false });
+      ClarityStorage.save(state);
       toast(copy.txPledge);
     } catch (e) {
       toast(e.shortMessage || e.message || String(e));
@@ -972,17 +1045,14 @@
     if (!state.demo) return;
     const copy = t();
     let touched = 0;
+    const seen = {};
     Object.keys(state.entries).forEach(function (k) {
-      const e = state.entries[k];
-      if (e && e.pledged && !e.released) {
-        const group = ClarityGraph.threadDays(state.entries, k);
-        group.forEach(function (d) {
-          if (state.entries[d] && !state.entries[d].released) {
-            state.entries[d].released = true;
-            touched += 1;
-          }
-        });
-      }
+      if (seen[k]) return;
+      if (threadStatus(k) !== "letting") return;
+      const group = ClarityGraph.threadDays(state.entries, k);
+      group.forEach(function (d) { seen[d] = true; });
+      setThreadFlags(k, { pledged: true, released: true });
+      touched += group.length;
     });
     ClarityStorage.save(state);
     paintUI();
@@ -1018,8 +1088,11 @@
     const d3 = shiftDay(today, -2);
     const calm = shiftDay(today, -8);
     state.entries = {};
+    // Thread 1: three linked days, all 没放下 (consistent)
     state.entries[d1] = makeEntry(d1, "他已读不回，是不是不爱我了", {
       threadLocalId: 1,
+      pledged: false,
+      released: false,
       moods: ["anxious", "rumination"],
       textZh: "他已读不回，是不是不爱我了",
       textEn: "He read it and didn't reply—does that mean he doesn't love me?"
@@ -1027,6 +1100,8 @@
     state.entries[d2] = makeEntry(d2, "想主动发消息，又怕显得很着急", {
       threadLocalId: 1,
       linkedDays: [d1],
+      pledged: false,
+      released: false,
       moods: ["overthink"],
       textZh: "想主动发消息，又怕显得很着急",
       textEn: "Want to text first, but afraid of looking too eager."
@@ -1034,11 +1109,13 @@
     state.entries[d3] = makeEntry(d3, "看到他朋友圈，有点嫉妒", {
       threadLocalId: 1,
       linkedDays: [d1, d2],
-      pledged: true,
+      pledged: false,
+      released: false,
       moods: ["wronged"],
       textZh: "看到他朋友圈，有点嫉妒",
       textEn: "Saw his social posts and felt a little jealous."
     });
+    // Thread 2: alone, already 已放下
     state.entries[calm] = makeEntry(calm, "以前想复合，现在决定好好生活", {
       threadLocalId: 2,
       linkedDays: [],

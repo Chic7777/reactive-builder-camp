@@ -61,7 +61,7 @@ powershell -ExecutionPolicy Bypass -File .\script\verify-calendar.ps1
 - **会记**：thread 的 touch、放下承诺（事件含义：我愿意好好生活）、合并、彻底放下。
 - **不记**：日记正文、姓名、聊天记录。正文只在浏览器 `localStorage`。
 
-触碰已「彻底放下」的团会重新打开；若仍处于已承诺状态，等待窗口重新计时。
+用户 touch / 新的关联写入会把整团打回「没放下」（清除 pledged 与 released）。只有再次 `pledgeLetGo` 才进入「放下中」；窗口内无新关联写入才「已放下」。未承诺的团不会被 cron 释放。
 
 ## 和旧练习的关系
 

@@ -143,18 +143,31 @@ contract CalendarPathTest is Test {
         assertFalse(reactive.subscribedCron());
     }
 
-    function test_touchResetsWindow() public {
+    /// @notice New related write (touch) returns thread to not-let-go: clears pledged; old window cannot release.
+    function test_touchClearsPledge_requiresRePledge() public {
         uint256 id = _open();
         _pledge(id);
-        uint64 pledgedAt = calendar.lastTouchAt(USER, id);
+        assertTrue(calendar.isPledged(USER, id));
+        assertTrue(reactive.subscribedCron());
+        assertEq(reactive.pendingCount(), 1);
 
+        uint64 pledgedAt = calendar.lastTouchAt(USER, id);
         vm.warp(uint256(pledgedAt) + WINDOW - 10);
         _touch(id);
 
+        assertFalse(calendar.isPledged(USER, id), "touch returns thread to not-let-go");
+        assertFalse(calendar.isReleased(USER, id));
+        assertEq(reactive.pendingCount(), 0, "unpledged thread leaves cron queue");
+        assertFalse(reactive.subscribedCron());
+
+        // Old window must not release after unpledge
         vm.warp(uint256(pledgedAt) + WINDOW + 1);
-        assertEq(_cron(1), 0, "touch should have reset the window");
+        assertEq(_cron(1), 0, "unpledged thread must not release");
         assertFalse(calendar.isReleased(USER, id));
 
+        // Re-pledge -> letting-go -> released after window
+        _pledge(id);
+        assertTrue(calendar.isPledged(USER, id));
         vm.warp(uint256(calendar.lastTouchAt(USER, id)) + WINDOW + 1);
         assertEq(_cron(2), 1);
         _deliverLatest();
@@ -205,7 +218,8 @@ contract CalendarPathTest is Test {
         assertEq(uint256(qt), root);
     }
 
-    function test_touchReleasedReopens() public {
+    /// @notice After released, a new related write returns to not-let-go (clears released + pledged).
+    function test_touchReleasedReturnsToNotLetGo() public {
         uint256 id = _open();
         _pledge(id);
         vm.warp(uint256(calendar.lastTouchAt(USER, id)) + WINDOW + 1);
@@ -215,8 +229,25 @@ contract CalendarPathTest is Test {
 
         _touch(id);
         assertFalse(calendar.isReleased(USER, id));
-        assertTrue(calendar.isPledged(USER, id));
-        assertTrue(reactive.subscribedCron());
+        assertFalse(calendar.isPledged(USER, id), "reopen is not-let-go, not still letting-go");
+        assertEq(reactive.pendingCount(), 0);
+        assertFalse(reactive.subscribedCron());
+    }
+
+    /// @notice linkAndTouch after a pledge clears pledged on the merged root.
+    function test_linkAndTouchClearsPledgedOnMergedThread() public {
+        uint256 a = _open();
+        uint256 b = _open();
+        _pledge(a);
+        assertTrue(calendar.isPledged(USER, a));
+
+        uint256[] memory ab = new uint256[](2);
+        ab[0] = a;
+        ab[1] = b;
+        uint256 root = _link(ab);
+        assertFalse(calendar.isPledged(USER, root), "linkAndTouch ends in not-let-go");
+        assertFalse(calendar.isReleased(USER, root));
+        assertEq(reactive.pendingCount(), 0);
     }
 
     function test_noReleaseBeforeWindow() public {
