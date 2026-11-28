@@ -3,7 +3,7 @@ window.ClarityConfig = {
   chainName: "Sepolia",
   rpcUrl: "https://ethereum-sepolia-rpc.publicnode.com",
   explorer: "https://sepolia.etherscan.io",
-  calendarAddress: "",
+  calendarAddress: "0x1aC6500DE229D169F4832BbE24Efdc5b1c720A46",
   demoWindowMinutes: 5,
   art: {
     morning: "./art/bg-morning.webp",
